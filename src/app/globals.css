@@ -10,6 +10,8 @@
   --text: #0a0a0a;
   --text-muted: #555555;
   --border: #e5e5e5;
+  --follow-bg: #f0eef6;
+  --follow-text: #5b4a9e;
 }
 
 [data-theme="dark"] {
@@ -17,6 +19,8 @@
   --text: #f5f5f5;
   --text-muted: #a3a3a3;
   --border: #262626;
+  --follow-bg: #1e1b2e;
+  --follow-text: #a78bfa;
 }
 
 body {
@@ -28,4 +32,21 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display), serif;
+}
+
+/* Scroll reveal animation */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.reveal.animate-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
 }
