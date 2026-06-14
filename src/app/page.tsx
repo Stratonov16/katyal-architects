@@ -2,11 +2,33 @@
 
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 
 export default function Home() {
   const sectionsRef = useRef<HTMLDivElement>(null);
   const reviewIndex = useRef(0);
+  const [heroSlides, setHeroSlides] = useState<{image_url: string; project_title: string; project_link: string}[]>([]);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [about, setAbout] = useState<{headline: string; description: string; photo_url: string} | null>(null);
+  const [reviews, setReviews] = useState<{client_name: string; project_name: string; quote: string; photo_url: string}[]>([]);
+  const [team, setTeam] = useState<{name: string; role: string; photo_url: string}[]>([]);
+  const [contact, setContact] = useState<{email: string; phone: string; address: string; maps_link: string} | null>(null);
+
+  useEffect(() => {
+    fetch("/api/public/hero").then((r) => r.json()).then((d) => { if (d.slides) setHeroSlides(d.slides); }).catch(() => {});
+    fetch("/api/public/about").then((r) => r.json()).then((d) => { if (d.about) setAbout(d.about); }).catch(() => {});
+    fetch("/api/public/reviews").then((r) => r.json()).then((d) => { if (d.reviews) setReviews(d.reviews); }).catch(() => {});
+    fetch("/api/public/team").then((r) => r.json()).then((d) => { if (d.team) setTeam(d.team); }).catch(() => {});
+    fetch("/api/public/contact").then((r) => r.json()).then((d) => { if (d.contact) setContact(d.contact); }).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (heroSlides.length <= 1) return;
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [heroSlides.length]);
 
   const slideReviews = useCallback((direction: number) => {
     const slider = document.querySelector(".review-slider") as HTMLElement;
@@ -67,19 +89,35 @@ export default function Home() {
       <main className="" ref={sectionsRef}>
         {/* 1. Hero — Auto-rotating Project Carousel */}
         <section className="relative min-h-screen flex items-end overflow-hidden">
-          <div className="absolute inset-0 bg-[var(--border)]">
-            {/* Full-screen project images — auto-rotates every 5s */}
-          </div>
+          {/* Background image from D1/R2 */}
+          {heroSlides.length > 0 ? (
+            heroSlides.map((slide, i) => (
+              <img
+                key={i}
+                src={slide.image_url}
+                alt={slide.project_title || "Project"}
+                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${i === currentSlide ? "opacity-100" : "opacity-0"}`}
+              />
+            ))
+          ) : (
+            <div className="absolute inset-0 bg-[var(--border)]" />
+          )}
 
           {/* Left arrow */}
-          <button className="absolute left-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full flex items-center justify-center text-white/80 hover:text-white hover:scale-110 transition-all duration-300">
+          <button
+            onClick={() => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length)}
+            className="absolute left-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full flex items-center justify-center text-white/80 hover:text-white hover:scale-110 transition-all duration-300"
+          >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="15 18 9 12 15 6" />
             </svg>
           </button>
 
           {/* Right arrow */}
-          <button className="absolute right-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full flex items-center justify-center text-white/80 hover:text-white hover:scale-110 transition-all duration-300">
+          <button
+            onClick={() => setCurrentSlide((prev) => (prev + 1) % heroSlides.length)}
+            className="absolute right-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full flex items-center justify-center text-white/80 hover:text-white hover:scale-110 transition-all duration-300"
+          >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="9 18 15 12 9 6" />
             </svg>
@@ -87,7 +125,15 @@ export default function Home() {
 
           {/* Project name at bottom */}
           <div className="relative z-10 w-full p-6 md:p-10 bg-gradient-to-t from-black/60 to-transparent">
-            <p className="text-xs uppercase tracking-[0.15em] text-white/70">Smile Luxury Salon</p>
+            {heroSlides.length > 0 && heroSlides[currentSlide] ? (
+              <Link href={heroSlides[currentSlide].project_link || "#"}>
+                <p className="text-xs uppercase tracking-[0.15em] text-white/70 hover:text-white transition-colors">
+                  {heroSlides[currentSlide].project_title || ""}
+                </p>
+              </Link>
+            ) : (
+              <p className="text-xs uppercase tracking-[0.15em] text-white/70">Loading...</p>
+            )}
           </div>
         </section>
 
@@ -95,11 +141,14 @@ export default function Home() {
         <section id="about" className="reveal py-32 px-8">
           <div className="max-w-3xl mx-auto text-center">
             <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-muted)] mb-8">About the Firm</p>
+            {about?.photo_url && (
+              <img src={about.photo_url} alt="About" className="w-32 h-32 rounded-full mx-auto mb-8 object-cover" />
+            )}
             <h2 className="text-3xl md:text-5xl font-light leading-tight">
-              We design spaces that inspire, transform, and endure.
+              {about?.headline || "We design spaces that inspire, transform, and endure."}
             </h2>
             <p className="mt-8 text-[var(--text-muted)] leading-relaxed max-w-xl mx-auto">
-              Katyal Architects is a design studio led by Shubham Katyal, creating architecture and interiors that balance bold vision with refined execution.
+              {about?.description || "Katyal Architects is a design studio led by Shubham Katyal, creating architecture and interiors that balance bold vision with refined execution."}
             </p>
           </div>
         </section>
@@ -161,22 +210,24 @@ export default function Home() {
             {/* Cards container — shows one at a time on mobile, 3 on desktop */}
             <div className="overflow-hidden mx-8 md:mx-12">
               <div className="review-slider flex transition-transform duration-500 ease-in-out">
-                {[
-                  { name: "Client Name", project: "Residential Villa", quote: "Working with Katyal Architects transformed our vision into reality. Every detail was considered." },
-                  { name: "Another Client", project: "Smile Salon", quote: "The design exceeded our expectations. A truly world-class experience." },
-                  { name: "Client Three", project: "Heritage Restoration", quote: "They understood our brief instantly and delivered beyond what we imagined." },
-                  { name: "Client Four", project: "Urban Township", quote: "A seamless experience from concept to completion. Highly recommended." },
-                  { name: "Client Five", project: "Boutique Hotel", quote: "Their attention to detail and understanding of space is unmatched." },
-                ].map((review) => (
-                  <div key={review.name} className="w-full md:w-1/3 flex-shrink-0 px-2">
+                {(reviews.length > 0 ? reviews : [
+                  { client_name: "Client Name", project_name: "Residential Villa", quote: "Working with Katyal Architects transformed our vision into reality. Every detail was considered.", photo_url: "" },
+                  { client_name: "Another Client", project_name: "Smile Salon", quote: "The design exceeded our expectations. A truly world-class experience.", photo_url: "" },
+                  { client_name: "Client Three", project_name: "Heritage Restoration", quote: "They understood our brief instantly and delivered beyond what we imagined.", photo_url: "" },
+                ]).map((review) => (
+                  <div key={review.client_name} className="w-full md:w-1/3 flex-shrink-0 px-2">
                     <div className="rounded-lg border border-[var(--review-border)] p-8 flex flex-col justify-between h-full shadow-sm">
                       <p className="text-base font-light italic leading-relaxed">&ldquo;{review.quote}&rdquo;</p>
                       <div className="mt-6 flex items-center justify-between">
                         <div>
-                          <p className="text-xs uppercase tracking-[0.1em]">{review.name}</p>
-                          <p className="text-[10px] text-[var(--text-muted)] mt-0.5">{review.project}</p>
+                          <p className="text-xs uppercase tracking-[0.1em]">{review.client_name}</p>
+                          <p className="text-[10px] text-[var(--text-muted)] mt-0.5">{review.project_name}</p>
                         </div>
-                        <div className="w-10 h-10 rounded-full bg-[var(--border)] flex-shrink-0" />
+                        {review.photo_url ? (
+                          <img src={review.photo_url} alt={review.client_name} className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
+                        ) : (
+                          <div className="w-10 h-10 rounded-full bg-[var(--border)] flex-shrink-0" />
+                        )}
                       </div>
                     </div>
                   </div>
@@ -195,13 +246,17 @@ export default function Home() {
         <section id="team" className="reveal py-16 px-8">
           <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-muted)] text-center mb-12">Our Team</p>
           <div className="grid grid-cols-3 gap-4 max-w-sm md:max-w-2xl mx-auto px-4">
-            {[
-              { name: "Shubham Katyal", role: "Founder & Principal Architect" },
-              { name: "Shelly Katyal", role: "Designer" },
-              { name: "Oreo", role: "Chief Happiness Officer" },
-            ].map((member) => (
+            {(team.length > 0 ? team : [
+              { name: "Shubham Katyal", role: "Founder & Principal Architect", photo_url: "" },
+              { name: "Shelly Katyal", role: "Designer", photo_url: "" },
+              { name: "Oreo", role: "Chief Happiness Officer", photo_url: "" },
+            ]).map((member) => (
               <div key={member.name} className="text-center group cursor-pointer">
-                <div className="w-16 h-16 md:w-28 md:h-28 bg-[var(--border)] mx-auto mb-3 rounded-full shadow-sm group-hover:shadow-md transition-all duration-300 group-hover:-translate-y-1 group-hover:scale-105 grayscale group-hover:grayscale-0" />
+                {member.photo_url ? (
+                  <img src={member.photo_url} alt={member.name} className="w-16 h-16 md:w-28 md:h-28 mx-auto mb-3 rounded-full object-cover shadow-sm group-hover:shadow-md transition-all duration-300 group-hover:-translate-y-1 group-hover:scale-105 grayscale group-hover:grayscale-0" />
+                ) : (
+                  <div className="w-16 h-16 md:w-28 md:h-28 bg-[var(--border)] mx-auto mb-3 rounded-full shadow-sm group-hover:shadow-md transition-all duration-300 group-hover:-translate-y-1 group-hover:scale-105 grayscale group-hover:grayscale-0" />
+                )}
                 <p className="text-[9px] md:text-sm uppercase tracking-[0.05em]">{member.name}</p>
                 <p className="text-[8px] md:text-xs text-[var(--text-muted)] mt-1">{member.role}</p>
               </div>
@@ -256,12 +311,12 @@ export default function Home() {
             </div>
             <div className="space-y-2 text-sm text-[#a3a3a3]">
               <p className="uppercase tracking-[0.15em] text-[#f5f5f5] text-xs mb-4">Contact</p>
-              <a href="https://maps.app.goo.gl/iuc8RB88AatwJu827" target="_blank" className="text-[#a3a3a3] hover:text-white transition-colors duration-300 flex items-center gap-2">
+              <a href={contact?.maps_link || "https://maps.app.goo.gl/iuc8RB88AatwJu827"} target="_blank" className="text-[#a3a3a3] hover:text-white transition-colors duration-300 flex items-center gap-2">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
-                2/108 Housing Board Colony, Hanumangarh, Rajasthan ↗
+                {contact?.address || "2/108 Housing Board Colony, Hanumangarh, Rajasthan"} ↗
               </a>
-              <p className="text-[#a3a3a3]">ar.shubhamkatyal@gmail.com</p>
-              <p className="text-[#a3a3a3]">+91 6377432778</p>
+              <p className="text-[#a3a3a3]">{contact?.email || "ar.shubhamkatyal@gmail.com"}</p>
+              <p className="text-[#a3a3a3]">{contact?.phone || "+91 6377432778"}</p>
               <div className="flex items-center gap-3 mt-3">
                 <a href="https://instagram.com/katyal_architects" target="_blank" className="hover:text-white transition-colors">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="2" y="2" width="20" height="20" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" y1="6.5" x2="17.51" y2="6.5" /></svg>
