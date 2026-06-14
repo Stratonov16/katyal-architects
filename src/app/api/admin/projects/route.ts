@@ -1,0 +1,108 @@
+export const runtime = "edge";
+
+import { NextRequest, NextResponse } from "next/server";
+import { getCurrentUser } from "@/lib/auth";
+import { query, execute } from "@/lib/db";
+
+// GET — list all projects (for admin)
+export async function GET() {
+  const user = await getCurrentUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const projects = await query(
+    `SELECT * FROM projects ORDER BY created_at DESC`
+  );
+
+  return NextResponse.json({ projects });
+}
+
+// POST — create new project
+export async function POST(request: NextRequest) {
+  const user = await getCurrentUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { title, slug, category, location, year, description, video_url, images } = await request.json();
+
+  if (!title || !category) {
+    return NextResponse.json({ error: "Title and category required" }, { status: 400 });
+  }
+
+  const status = user.role === "super_admin" ? "published" : "draft";
+
+  await execute(
+    `INSERT INTO projects (title, slug, category, description, location, year, video_url, status, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [title, slug, category, description || "", location || "", year || 2026, video_url || "", status, user.email]
+  );
+
+  // Get the project ID
+  const project = await query<{ id: number }>(
+    `SELECT id FROM projects WHERE slug = ? ORDER BY created_at DESC LIMIT 1`,
+    [slug]
+  );
+
+  if (project.length > 0 && images && images.length > 0) {
+    const projectId = project[0].id;
+    for (let i = 0; i < images.length; i++) {
+      await execute(
+        `INSERT INTO project_images (project_id, image_url, is_featured, "order") VALUES (?, ?, ?, ?)`,
+        [projectId, images[i], i === 0 ? 1 : 0, i]
+      );
+    }
+  }
+
+  return NextResponse.json({ success: true, message: status === "published" ? "Published!" : "Saved as draft" });
+}
+
+// PUT — update project
+export async function PUT(request: NextRequest) {
+  const user = await getCurrentUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { id, title, slug, category, location, year, description, video_url, images } = await request.json();
+
+  if (!id) return NextResponse.json({ error: "Project ID required" }, { status: 400 });
+
+  const status = user.role === "super_admin" ? "published" : "draft";
+
+  await execute(
+    `UPDATE projects SET title=?, slug=?, category=?, description=?, location=?, year=?, video_url=?, status=?, updated_at=datetime('now') WHERE id=?`,
+    [title, slug, category, description || "", location || "", year || 2026, video_url || "", status, id]
+  );
+
+  // Add new images if provided
+  if (images && images.length > 0) {
+    const existing = await query<{ id: number }>(`SELECT id FROM project_images WHERE project_id=?`, [id]);
+    const startOrder = existing.length;
+    for (let i = 0; i < images.length; i++) {
+      await execute(
+        `INSERT INTO project_images (project_id, image_url, is_featured, "order") VALUES (?, ?, ?, ?)`,
+        [id, images[i], existing.length === 0 && i === 0 ? 1 : 0, startOrder + i]
+      );
+    }
+  }
+
+  return NextResponse.json({ success: true, message: "Updated!" });
+}
+
+// DELETE — delete project
+export async function DELETE(request: NextRequest) {
+  const user = await getCurrentUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get("id");
+
+  if (!id) return NextResponse.json({ error: "Project ID required" }, { status: 400 });
+
+  if (user.role === "super_admin") {
+    await execute(`DELETE FROM project_images WHERE project_id=?`, [id]);
+    await execute(`DELETE FROM projects WHERE id=?`, [id]);
+    return NextResponse.json({ success: true, message: "Deleted" });
+  } else {
+    await execute(
+      `INSERT INTO drafts (type, action, reference_id, submitted_by, status) VALUES ('project', 'delete', ?, ?, 'pending')`,
+      [id, user.email]
+    );
+    return NextResponse.json({ success: true, message: "Delete request submitted for approval" });
+  }
+}
