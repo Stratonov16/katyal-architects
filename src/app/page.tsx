@@ -108,16 +108,43 @@ export default function Home() {
       <main className="" ref={sectionsRef}>
         {/* 1. Hero — Auto-rotating Project Carousel */}
         <section className="relative min-h-screen flex items-end overflow-hidden">
-          {/* Background image from D1/R2 */}
+          {/* Background media from D1/R2 */}
           {heroSlides.length > 0 ? (
-            heroSlides.map((slide, i) => (
-              <img
-                key={i}
-                src={slide.image_url}
-                alt={slide.project_title || "Project"}
-                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${i === currentSlide ? "opacity-100" : "opacity-0"}`}
-              />
-            ))
+            heroSlides.map((slide, i) => {
+              const url = slide.image_url;
+              const isVideo = url.endsWith(".mp4") || url.endsWith(".webm") || url.endsWith(".mov");
+              const isYoutube = url.includes("youtube.com") || url.includes("youtu.be") || url.includes("img.youtube.com");
+              const youtubeId = isYoutube ? url.match(/vi\/([^/]+)/)?.[1] || url.match(/embed\/([^?]+)/)?.[1] || url.match(/v=([^&]+)/)?.[1] : null;
+
+              return (
+                <div key={i} className={`absolute inset-0 transition-opacity duration-1000 ${i === currentSlide ? "opacity-100" : "opacity-0"}`}>
+                  {isVideo ? (
+                    <video
+                      src={url}
+                      className="w-full h-full object-cover"
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                    />
+                  ) : isYoutube && youtubeId ? (
+                    <iframe
+                      src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&mute=1&loop=1&playlist=${youtubeId}&controls=0&showinfo=0&modestbranding=1`}
+                      className="w-full h-full"
+                      style={{ transform: "scale(1.2)" }}
+                      allow="autoplay; encrypted-media"
+                      frameBorder="0"
+                    />
+                  ) : (
+                    <img
+                      src={url}
+                      alt={slide.project_title || "Project"}
+                      className="w-full h-full object-cover"
+                    />
+                  )}
+                </div>
+              );
+            })
           ) : (
             <div className="absolute inset-0 bg-[var(--border)]" />
           )}

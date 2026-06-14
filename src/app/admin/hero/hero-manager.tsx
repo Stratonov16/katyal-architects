@@ -238,15 +238,19 @@ export default function HeroManager({ userRole }: { userRole: string }) {
           <div className="relative aspect-[16/7] bg-[var(--border)] rounded-md overflow-hidden">
             {slides.length > 0 ? (
               <>
-                <img
-                  src={slides[0].imageUrl}
-                  alt="Hero preview"
-                  className="w-full h-full object-cover"
-                  style={slides[0].cropData ? {
-                    objectPosition: `${50 + slides[0].cropData.x / 5}% ${50 + slides[0].cropData.y / 5}%`,
-                    transform: `scale(${slides[0].cropData.zoom})`,
-                  } : undefined}
-                />
+                {slides[0].imageUrl.endsWith(".mp4") || slides[0].imageUrl.endsWith(".webm") ? (
+                  <video src={slides[0].imageUrl} className="w-full h-full object-cover" autoPlay muted loop playsInline />
+                ) : (
+                  <img
+                    src={slides[0].imageUrl}
+                    alt="Hero preview"
+                    className="w-full h-full object-cover"
+                    style={slides[0].cropData ? {
+                      objectPosition: `${50 + slides[0].cropData.x / 5}% ${50 + slides[0].cropData.y / 5}%`,
+                      transform: `scale(${slides[0].cropData.zoom})`,
+                    } : undefined}
+                  />
+                )}
                 <div className="absolute bottom-4 left-4 bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded">
                   <p className="text-[10px] text-white/70 uppercase tracking-[0.15em]">
                     {slides[0].projectTitle || "Untitled"}
@@ -300,16 +304,20 @@ export default function HeroManager({ userRole }: { userRole: string }) {
                 {/* Thumbnail — click to re-crop */}
                 <div
                   className="relative w-full h-32 rounded overflow-hidden cursor-pointer group mb-3"
-                  onClick={() => setCroppingSlide(slide.id)}
+                  onClick={() => !slide.imageUrl.endsWith(".mp4") && !slide.imageUrl.endsWith(".webm") && setCroppingSlide(slide.id)}
                 >
-                  <img
-                    src={slide.imageUrl}
-                    alt={`Slide ${index + 1}`}
-                    className="w-full h-full object-cover"
-                    style={slide.cropData ? {
-                      objectPosition: `${50 + slide.cropData.x / 5}% ${50 + slide.cropData.y / 5}%`,
-                    } : undefined}
-                  />
+                  {slide.imageUrl.endsWith(".mp4") || slide.imageUrl.endsWith(".webm") ? (
+                    <video src={slide.imageUrl} className="w-full h-full object-cover" muted playsInline />
+                  ) : (
+                    <img
+                      src={slide.imageUrl}
+                      alt={`Slide ${index + 1}`}
+                      className="w-full h-full object-cover"
+                      style={slide.cropData ? {
+                        objectPosition: `${50 + slide.cropData.x / 5}% ${50 + slide.cropData.y / 5}%`,
+                      } : undefined}
+                    />
+                  )}
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
                     <p className="text-[9px] text-white opacity-0 group-hover:opacity-100 transition-opacity uppercase tracking-[0.1em]">
                       Edit Crop
