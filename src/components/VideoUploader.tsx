@@ -67,7 +67,7 @@ export default function VideoUploader({ onSelect, onCancel }: VideoUploaderProps
       await ffmpeg.exec(["-i", inputName, "-crf", String(crf), "-preset", "fast", outputName]);
 
       const data = await ffmpeg.readFile(outputName);
-      const compressedFile = new File([data], preview.file.name, { type: "video/mp4" });
+      const compressedFile = new File([data as unknown as BlobPart], preview.file.name, { type: "video/mp4" });
 
       setCompressed(compressedFile);
       setCompressing(false);

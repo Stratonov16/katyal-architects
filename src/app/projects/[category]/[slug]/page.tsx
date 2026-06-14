@@ -1,10 +1,8 @@
+export const runtime = "edge";
+
 import Link from "next/link";
 import { getProjectBySlug, getProjectsByCategory, projects, categories } from "@/lib/projects";
 import Navbar from "@/components/Navbar";
-
-export function generateStaticParams() {
-  return projects.map((p) => ({ category: p.category, slug: p.slug }));
-}
 
 export default async function ProjectPage({ params }: { params: Promise<{ category: string; slug: string }> }) {
   const { category, slug } = await params;
