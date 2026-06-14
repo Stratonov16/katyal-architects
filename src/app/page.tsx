@@ -8,6 +8,7 @@ export default function Home() {
   const sectionsRef = useRef<HTMLDivElement>(null);
   const reviewIndex = useRef(0);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [activeTeamMember, setActiveTeamMember] = useState<string | null>(null);
   const [heroSlides, setHeroSlides] = useState<{image_url: string; project_title: string; project_link: string}[]>([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [about, setAbout] = useState<{headline: string; description: string; photo_url: string} | null>(null);
@@ -298,11 +299,11 @@ export default function Home() {
               { name: "Shelly Katyal", role: "Designer", photo_url: "" },
               { name: "Oreo", role: "Chief Happiness Officer", photo_url: "" },
             ]).map((member) => (
-              <div key={member.name} className="text-center group cursor-pointer">
+              <div key={member.name} className="text-center cursor-pointer" onClick={() => setActiveTeamMember(activeTeamMember === member.name ? null : member.name)}>
                 {member.photo_url ? (
-                  <img src={member.photo_url} alt={member.name} className="w-16 h-16 md:w-28 md:h-28 mx-auto mb-3 rounded-full object-cover shadow-sm group-hover:shadow-md group-active:shadow-md transition-all duration-300 group-hover:-translate-y-1 group-hover:scale-105 group-active:scale-105 grayscale group-hover:grayscale-0 group-active:grayscale-0" />
+                  <img src={member.photo_url} alt={member.name} className={`w-16 h-16 md:w-28 md:h-28 mx-auto mb-3 rounded-full object-cover shadow-sm transition-all duration-300 ${activeTeamMember === member.name ? "grayscale-0 scale-105 shadow-md -translate-y-1" : "grayscale md:hover:grayscale-0 md:hover:scale-105 md:hover:shadow-md md:hover:-translate-y-1"}`} />
                 ) : (
-                  <div className="w-16 h-16 md:w-28 md:h-28 bg-[var(--border)] mx-auto mb-3 rounded-full shadow-sm group-hover:shadow-md group-active:shadow-md transition-all duration-300 group-hover:-translate-y-1 group-hover:scale-105 group-active:scale-105 grayscale group-hover:grayscale-0 group-active:grayscale-0" />
+                  <div className={`w-16 h-16 md:w-28 md:h-28 bg-[var(--border)] mx-auto mb-3 rounded-full shadow-sm transition-all duration-300 ${activeTeamMember === member.name ? "scale-105 shadow-md -translate-y-1" : "md:hover:scale-105 md:hover:shadow-md md:hover:-translate-y-1"}`} />
                 )}
                 <p className="text-[9px] md:text-sm uppercase tracking-[0.05em]">{member.name}</p>
                 <p className="text-[8px] md:text-xs text-[var(--text-muted)] mt-1">{member.role}</p>
