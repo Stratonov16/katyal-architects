@@ -8,6 +8,7 @@ import AdminHeader from "@/components/AdminHeader";
 export default function AdminDashboard({ user }: { user: AuthUser }) {
   const router = useRouter();
   const [stats, setStats] = useState({ projects: 0, team: 0, reviews: 0, drafts: 0 });
+  const [analytics, setAnalytics] = useState<{ totalViews: number; totalVisitors: number; period: string } | null>(null);
 
   useEffect(() => {
     Promise.all([
@@ -22,6 +23,11 @@ export default function AdminDashboard({ user }: { user: AuthUser }) {
         drafts: 0,
       });
     }).catch(() => {});
+
+    fetch("/api/admin/analytics")
+      .then((r) => r.json())
+      .then((d) => { if (d.totalViews !== undefined) setAnalytics(d); })
+      .catch(() => {});
   }, []);
 
   const handleLogout = async () => {
@@ -87,8 +93,28 @@ export default function AdminDashboard({ user }: { user: AuthUser }) {
           ))}
         </div>
 
+        {/* Analytics */}
+        {analytics && (
+          <div className="mt-12 border border-[var(--border)] rounded-md p-6">
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)]">Website Traffic</p>
+              <p className="text-[9px] text-[var(--text-muted)]">{analytics.period}</p>
+            </div>
+            <div className="grid grid-cols-2 gap-6">
+              <div>
+                <p className="text-3xl font-light">{analytics.totalVisitors}</p>
+                <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] mt-1">Visitors</p>
+              </div>
+              <div>
+                <p className="text-3xl font-light">{analytics.totalViews}</p>
+                <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] mt-1">Page Views</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Quick stats */}
-        <div className="mt-12 grid grid-cols-3 gap-4 text-center">
+        <div className="mt-8 grid grid-cols-3 gap-4 text-center">
           <div className="border border-[var(--border)] rounded-md p-4">
             <p className="text-2xl font-light">{stats.projects}</p>
             <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] mt-1">Projects</p>
