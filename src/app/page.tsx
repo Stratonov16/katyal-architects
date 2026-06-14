@@ -1,6 +1,7 @@
 "use client";
 
 import Navbar from "@/components/Navbar";
+import Link from "next/link";
 import { useEffect, useRef, useCallback } from "react";
 
 export default function Home() {
@@ -115,7 +116,7 @@ export default function Home() {
               { category: "Commercial", slug: "commercial" },
               { category: "Township", slug: "township" },
             ].map((item) => (
-              <a
+              <Link
                 key={item.slug}
                 href={`/projects/${item.slug}`}
                 className="group relative aspect-[4/3] rounded-md overflow-hidden"
@@ -128,7 +129,7 @@ export default function Home() {
                 <p className="absolute bottom-4 left-4 z-10 text-[11px] md:text-xs uppercase tracking-[0.2em] text-white font-light">
                   {item.category}
                 </p>
-              </a>
+              </Link>
             ))}
           </div>
         </section>
