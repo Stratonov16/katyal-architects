@@ -1,7 +1,7 @@
+export const runtime = "edge";
 import { NextResponse } from "next/server";
 import { query } from "@/lib/db";
 
-export const runtime = "edge";
 
 export async function GET() {
   const slides = await query(

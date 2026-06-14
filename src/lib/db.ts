@@ -5,7 +5,6 @@ export function getDB() {
   return env.DB;
 }
 
-// Helper to run queries
 export async function query<T = unknown>(sql: string, params: unknown[] = []): Promise<T[]> {
   const db = getDB();
   const result = await db.prepare(sql).bind(...params).all();

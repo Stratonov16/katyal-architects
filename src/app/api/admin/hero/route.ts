@@ -1,8 +1,8 @@
+export const runtime = "edge";
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { query, execute } from "@/lib/db";
 
-export const runtime = "edge";
 
 // GET — fetch all hero slides
 export async function GET() {

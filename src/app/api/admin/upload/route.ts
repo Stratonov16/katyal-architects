@@ -1,8 +1,8 @@
+export const runtime = "edge";
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { uploadToR2, generateKey } from "@/lib/r2";
 
-export const runtime = "edge";
 
 const MAX_IMAGE_SIZE = 20 * 1024 * 1024; // 20MB
 const MAX_VIDEO_SIZE = 200 * 1024 * 1024; // 200MB

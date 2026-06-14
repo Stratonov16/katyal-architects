@@ -1,0 +1,40 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"main": ".open-next/worker.js",
+	"name": "katyal-architects",
+	"compatibility_date": "2026-06-13",
+	"compatibility_flags": [
+		"nodejs_compat",
+		"global_fetch_strictly_public"
+	],
+	"assets": {
+		"directory": ".open-next/assets",
+		"binding": "ASSETS"
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "katyal-architects-db",
+			"database_id": "5b76706e-5630-4d45-a1a8-2fc459db83b7"
+		}
+	],
+	"r2_buckets": [
+		{
+			"binding": "BUCKET",
+			"bucket_name": "katyal-architects-media"
+		},
+		{
+			"binding": "NEXT_INC_CACHE_R2_BUCKET",
+			"bucket_name": "katyal-architects-opennext-cache"
+		}
+	],
+	"vars": {
+		"R2_PUBLIC_URL": "https://pub-79d22fbf37e444a896d6acc795f2444b.r2.dev"
+	},
+	"services": [
+		{
+			"binding": "WORKER_SELF_REFERENCE",
+			"service": "katyal-architects"
+		}
+	]
+}

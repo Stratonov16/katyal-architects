@@ -8,7 +8,7 @@ export function getR2() {
 function getPublicUrl(): string {
   try {
     const { env } = getRequestContext();
-    return (env as unknown as Record<string, string>).R2_PUBLIC_URL || process.env.R2_PUBLIC_URL || "";
+    return (env as unknown as Record<string, string>).R2_PUBLIC_URL || "";
   } catch {
     return process.env.R2_PUBLIC_URL || "";
   }

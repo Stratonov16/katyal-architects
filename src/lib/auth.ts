@@ -2,6 +2,13 @@ import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 
+export type UserRole = "super_admin" | "client_admin";
+
+export type AuthUser = {
+  email: string;
+  role: UserRole;
+};
+
 function getEnv(key: string): string {
   try {
     const { env } = getRequestContext();
@@ -10,13 +17,6 @@ function getEnv(key: string): string {
     return process.env[key] || "";
   }
 }
-
-export type UserRole = "super_admin" | "client_admin";
-
-export type AuthUser = {
-  email: string;
-  role: UserRole;
-};
 
 function getSecret() {
   return new TextEncoder().encode(getEnv("JWT_SECRET") || "fallback-secret");
@@ -56,10 +56,10 @@ export function resetAttempts(ip: string): void {
 
 // Super admin check (env vars only)
 export function validateSuperAdmin(email: string, password: string): AuthUser | null {
-  if (
-    email === getEnv("SUPER_ADMIN_EMAIL") &&
-    password === getEnv("SUPER_ADMIN_PASSWORD")
-  ) {
+  const adminEmail = getEnv("SUPER_ADMIN_EMAIL");
+  const adminPassword = getEnv("SUPER_ADMIN_PASSWORD");
+
+  if (email === adminEmail && password === adminPassword) {
     return { email, role: "super_admin" };
   }
   return null;

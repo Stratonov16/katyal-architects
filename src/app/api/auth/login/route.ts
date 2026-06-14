@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Email and password required." }, { status: 400 });
   }
 
-  const user = validateCredentials(email, password);
+  const user = await validateCredentials(email, password);
 
   if (!user) {
     recordFailedAttempt(ip);
