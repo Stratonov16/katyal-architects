@@ -14,6 +14,7 @@ export default function Home() {
   const [reviews, setReviews] = useState<{client_name: string; project_name: string; quote: string; photo_url: string}[]>([]);
   const [team, setTeam] = useState<{name: string; role: string; photo_url: string}[]>([]);
   const [contact, setContact] = useState<{email: string; phone: string; address: string; maps_link: string} | null>(null);
+  const [services, setServices] = useState<{slug: string; name: string; image_url: string}[]>([]);
 
   useEffect(() => {
     fetch("/api/public/hero").then((r) => r.json()).then((d) => { if (d.slides) setHeroSlides(d.slides); }).catch(() => {});
@@ -21,6 +22,7 @@ export default function Home() {
     fetch("/api/public/reviews").then((r) => r.json()).then((d) => { if (d.reviews) setReviews(d.reviews); }).catch(() => {});
     fetch("/api/public/team").then((r) => r.json()).then((d) => { if (d.team) setTeam(d.team); }).catch(() => {});
     fetch("/api/public/contact").then((r) => r.json()).then((d) => { if (d.contact) setContact(d.contact); }).catch(() => {});
+    fetch("/api/public/services").then((r) => r.json()).then((d) => { if (d.services) setServices(d.services); }).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -201,26 +203,27 @@ export default function Home() {
         <section id="projects" className="reveal-grow py-24 px-8">
           <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-muted)] mb-12 text-center">Services</p>
           <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
-            {[
-              { category: "Residential", slug: "residential" },
-              { category: "Hospitality", slug: "hospitality" },
-              { category: "Interiors", slug: "interiors" },
-              { category: "Landscape", slug: "landscape" },
-              { category: "Commercial", slug: "commercial" },
-              { category: "Township", slug: "township" },
-            ].map((item) => (
+            {(services.length > 0 ? services : [
+              { name: "Residential", slug: "residential", image_url: "" },
+              { name: "Hospitality", slug: "hospitality", image_url: "" },
+              { name: "Interiors", slug: "interiors", image_url: "" },
+              { name: "Landscape", slug: "landscape", image_url: "" },
+              { name: "Commercial", slug: "commercial", image_url: "" },
+              { name: "Township", slug: "township", image_url: "" },
+            ]).map((item) => (
               <Link
                 key={item.slug}
                 href={`/projects/${item.slug}`}
                 className="group relative aspect-[4/3] rounded-md overflow-hidden"
               >
-                {/* Background image placeholder */}
-                <div className="absolute inset-0 bg-[var(--border)] group-hover:scale-105 transition-transform duration-500" />
-                {/* Dark overlay for text readability */}
+                {item.image_url ? (
+                  <img src={item.image_url} alt={item.name} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                ) : (
+                  <div className="absolute inset-0 bg-[var(--border)] group-hover:scale-105 transition-transform duration-500" />
+                )}
                 <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-300" />
-                {/* Category name at bottom */}
                 <p className="absolute bottom-4 left-4 z-10 text-[11px] md:text-xs uppercase tracking-[0.2em] text-white font-light">
-                  {item.category}
+                  {item.name}
                 </p>
               </Link>
             ))}
