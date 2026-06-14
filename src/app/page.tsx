@@ -348,13 +348,16 @@ export default function Home() {
               <img src="https://pub-79d22fbf37e444a896d6acc795f2444b.r2.dev/static/logo/logo.jpg" alt="Katyal Architects" className="w-10 h-10 object-cover rounded-full" />
               <p className="mt-2 text-sm text-[#a3a3a3] italic">Driven by Vision, Defined by Impact.</p>
             </div>
-            <div className="space-y-2 text-sm text-[#a3a3a3]">
+            <div className="text-sm text-[#a3a3a3]">
               <p className="uppercase tracking-[0.15em] text-[#f5f5f5] text-xs mb-4">Quick Links</p>
-              <a href="#about" className="block hover:text-white transition-colors duration-300">About</a>
-              <a href="#projects" className="block hover:text-white transition-colors duration-300">Services</a>
-              <a href="#reviews" className="block hover:text-white transition-colors duration-300">Reviews</a>
-              <a href="#contact" className="block hover:text-white transition-colors duration-300">Contact</a>
-              <a href="/admin" className="block hover:text-white transition-colors duration-300">Admin</a>
+              <div className="grid grid-cols-2 gap-x-8 gap-y-2">
+                <a href="#about" className="hover:text-white transition-colors duration-300">About</a>
+                <a href="#reviews" className="hover:text-white transition-colors duration-300">Reviews</a>
+                <a href="#projects" className="hover:text-white transition-colors duration-300">Services</a>
+                <a href="#contact" className="hover:text-white transition-colors duration-300">Contact</a>
+                <a href="#team" className="hover:text-white transition-colors duration-300">Team</a>
+                <a href="/admin" className="hover:text-white transition-colors duration-300">Admin</a>
+              </div>
             </div>
             <div className="space-y-2 text-sm text-[#a3a3a3]">
               <p className="uppercase tracking-[0.15em] text-[#f5f5f5] text-xs mb-4">Contact</p>
