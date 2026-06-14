@@ -315,24 +315,51 @@ export default function Home() {
         <section id="contact" className="reveal py-24 px-8">
           <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-muted)] mb-8 text-center">Get in Touch</p>
           <h2 className="text-3xl md:text-4xl font-light mb-12 text-center">Have a project in mind?</h2>
-          <form className="w-full max-w-lg mx-auto space-y-6">
-            <input type="text" placeholder="Name" className="w-full bg-transparent border-b border-[var(--border)] py-3 text-sm outline-none focus:border-[var(--text)] transition-colors duration-300" />
-            <input type="email" placeholder="Email" className="w-full bg-transparent border-b border-[var(--border)] py-3 text-sm outline-none focus:border-[var(--text)] transition-colors duration-300" />
+          <form className="w-full max-w-lg mx-auto space-y-6" onSubmit={async (e) => {
+            e.preventDefault();
+            const form = e.currentTarget;
+            const formData = new FormData(form);
+            const body = {
+              name: formData.get("name"),
+              email: formData.get("email"),
+              phone: formData.get("phone"),
+              service: formData.get("service"),
+              location: formData.get("location"),
+            };
+            try {
+              const res = await fetch("/api/public/submit", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body),
+              });
+              const data = await res.json();
+              if (res.ok) {
+                alert(data.message || "Thank you! We'll get back to you soon.");
+                form.reset();
+              } else {
+                alert(data.error || "Something went wrong. Try again.");
+              }
+            } catch {
+              alert("Something went wrong. Try again.");
+            }
+          }}>
+            <input name="name" type="text" placeholder="Name" required className="w-full bg-transparent border-b border-[var(--border)] py-3 text-sm outline-none focus:border-[var(--text)] transition-colors duration-300" />
+            <input name="email" type="email" placeholder="Email" required className="w-full bg-transparent border-b border-[var(--border)] py-3 text-sm outline-none focus:border-[var(--text)] transition-colors duration-300" />
             <div className="flex items-center border-b border-[var(--border)] focus-within:border-[var(--text)] transition-colors duration-300 [&:has(input:invalid:not(:placeholder-shown))]:border-red-500">
               <span className="text-sm text-[var(--text-muted)] pr-2">+91</span>
-              <input type="tel" pattern="[0-9]{10}" maxLength={10} placeholder="Phone Number" className="w-full bg-transparent py-3 text-sm outline-none invalid:[&:not(:placeholder-shown)]:text-red-500" onInput={(e) => { e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, ''); }} />
+              <input name="phone" type="tel" pattern="[0-9]{10}" maxLength={10} placeholder="Phone Number" className="w-full bg-transparent py-3 text-sm outline-none invalid:[&:not(:placeholder-shown)]:text-red-500" onInput={(e) => { e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, ''); }} />
             </div>
-            <select className="w-full bg-transparent border-b border-[var(--border)] py-3 text-sm outline-none focus:border-[var(--text)] transition-colors duration-300 text-[var(--text-muted)]">
+            <select name="service" className="w-full bg-transparent border-b border-[var(--border)] py-3 text-sm outline-none focus:border-[var(--text)] transition-colors duration-300 text-[var(--text-muted)]">
               <option value="">Select Service</option>
-              <option>Hospitality Design</option>
-              <option>Architecture</option>
-              <option>Interior Design</option>
+              <option>Residential</option>
+              <option>Hospitality</option>
+              <option>Interiors</option>
               <option>Landscape</option>
-              <option>Commercial Space</option>
+              <option>Commercial</option>
               <option>Township</option>
               <option>Others</option>
             </select>
-            <input type="text" placeholder="Location" className="w-full bg-transparent border-b border-[var(--border)] py-3 text-sm outline-none focus:border-[var(--text)] transition-colors duration-300" />
+            <input name="location" type="text" placeholder="Location" className="w-full bg-transparent border-b border-[var(--border)] py-3 text-sm outline-none focus:border-[var(--text)] transition-colors duration-300" />
             <div className="flex justify-center mt-8">
               <button type="submit" className="text-xs uppercase tracking-[0.3em] border border-[var(--text)] px-8 py-4 rounded-md hover:bg-[var(--text)] hover:text-[var(--bg)] transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
                 Get Quote Now
