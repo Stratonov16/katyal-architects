@@ -16,6 +16,18 @@ type Project = {
   status: string;
 };
 
+type ExistingImage = {
+  id: number;
+  image_url: string;
+  is_featured: number;
+  order: number;
+};
+
+type NewImage = {
+  file: File;
+  preview: string;
+};
+
 const CATEGORIES = [
   { name: "Residential", slug: "residential" },
   { name: "Hospitality", slug: "hospitality" },
@@ -39,7 +51,10 @@ export default function ProjectsManager({ userRole }: { userRole: string }) {
   const [year, setYear] = useState(2026);
   const [description, setDescription] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
-  const [images, setImages] = useState<File[]>([]);
+  const [existingImages, setExistingImages] = useState<ExistingImage[]>([]);
+  const [deletedImageIds, setDeletedImageIds] = useState<number[]>([]);
+  const [newImages, setNewImages] = useState<NewImage[]>([]);
+  const [featuredIndex, setFeaturedIndex] = useState(0);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -59,12 +74,15 @@ export default function ProjectsManager({ userRole }: { userRole: string }) {
     setYear(2026);
     setDescription("");
     setVideoUrl("");
-    setImages([]);
+    setExistingImages([]);
+    setDeletedImageIds([]);
+    setNewImages([]);
+    setFeaturedIndex(0);
     setEditing(null);
     setShowForm(false);
   };
 
-  const handleEdit = (project: Project) => {
+  const handleEdit = async (project: Project) => {
     setTitle(project.title);
     setCategory(project.category);
     setLocation(project.location);
@@ -73,6 +91,19 @@ export default function ProjectsManager({ userRole }: { userRole: string }) {
     setVideoUrl(project.video_url || "");
     setEditing(project);
     setShowForm(true);
+    setNewImages([]);
+    setDeletedImageIds([]);
+
+    // Fetch existing images for this project
+    const res = await fetch(`/api/admin/projects?id=${project.id}&images=true`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data.images) {
+        setExistingImages(data.images);
+        const featIdx = data.images.findIndex((img: ExistingImage) => img.is_featured);
+        setFeaturedIndex(featIdx >= 0 ? featIdx : 0);
+      }
+    }
   };
 
   const handleDelete = async (id: number) => {
@@ -86,25 +117,57 @@ export default function ProjectsManager({ userRole }: { userRole: string }) {
     }
   };
 
+  const removeExistingImage = (imgId: number) => {
+    setDeletedImageIds([...deletedImageIds, imgId]);
+    setExistingImages(existingImages.filter((img) => img.id !== imgId));
+  };
+
+  const removeNewImage = (index: number) => {
+    URL.revokeObjectURL(newImages[index].preview);
+    setNewImages(newImages.filter((_, i) => i !== index));
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    const files = Array.from(e.target.files).map((file) => ({
+      file,
+      preview: URL.createObjectURL(file),
+    }));
+    setNewImages([...newImages, ...files]);
+    e.target.value = "";
+  };
+
+  // Total images count (existing not deleted + new)
+  const totalImages = existingImages.length + newImages.length;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setUploading(true);
 
-    // Upload images first
-    const imageUrls: string[] = [];
-    for (const file of images) {
+    // Upload new images first
+    const uploadedUrls: string[] = [];
+    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/-+$/, "");
+    for (const img of newImages) {
       const formData = new FormData();
-      formData.append("file", file);
-      formData.append("folder", `projects/${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`);
+      formData.append("file", img.file);
+      formData.append("folder", `projects/${slug}`);
       const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
       if (res.ok) {
         const data = await res.json();
-        imageUrls.push(data.url);
+        uploadedUrls.push(data.url);
       }
     }
 
-    // Save project
-    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/-+$/, "");
+    // Determine which is featured
+    // featuredIndex is relative to the combined list (existing + new)
+    let featuredUrl = "";
+    if (featuredIndex < existingImages.length) {
+      featuredUrl = existingImages[featuredIndex].image_url;
+    } else {
+      const newIdx = featuredIndex - existingImages.length;
+      if (uploadedUrls[newIdx]) featuredUrl = uploadedUrls[newIdx];
+    }
+
     const body = {
       id: editing?.id,
       title,
@@ -114,7 +177,9 @@ export default function ProjectsManager({ userRole }: { userRole: string }) {
       year,
       description,
       video_url: videoUrl,
-      images: imageUrls,
+      newImages: uploadedUrls,
+      deletedImageIds,
+      featuredUrl,
     };
 
     const res = await fetch("/api/admin/projects", {
@@ -129,7 +194,6 @@ export default function ProjectsManager({ userRole }: { userRole: string }) {
     if (res.ok) {
       setToast({ message: data.message || "Saved!", type: "success" });
       resetForm();
-      // Reload projects
       const reload = await fetch("/api/admin/projects");
       const reloadData = await reload.json();
       if (reloadData.projects) setProjects(reloadData.projects);
@@ -152,7 +216,7 @@ export default function ProjectsManager({ userRole }: { userRole: string }) {
   return (
     <div className="min-h-screen bg-[var(--bg)]">
       <AdminHeader />
-      <div className="max-w-5xl mx-auto px-8 pt-20">
+      <div className="max-w-5xl mx-auto px-8 pt-20 pb-20">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -226,39 +290,81 @@ export default function ProjectsManager({ userRole }: { userRole: string }) {
                 className="w-full bg-transparent border-b border-[var(--border)] py-3 text-sm outline-none focus:border-[var(--text)] transition-colors"
               />
 
-              {/* Image upload */}
+              {/* Image section */}
               <div>
+                <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-3">
+                  Images ({totalImages}) — click to set featured
+                </p>
+
+                {/* Existing images */}
+                {existingImages.length > 0 && (
+                  <div className="flex gap-2 flex-wrap mb-3">
+                    {existingImages.map((img, i) => (
+                      <div
+                        key={img.id}
+                        className={`relative w-20 h-20 rounded overflow-hidden cursor-pointer border-2 ${featuredIndex === i ? "border-green-500" : "border-transparent"}`}
+                        onClick={() => setFeaturedIndex(i)}
+                      >
+                        <img src={img.image_url} alt="" className="w-full h-full object-cover" />
+                        {featuredIndex === i && (
+                          <div className="absolute top-0 left-0 bg-green-500 text-white text-[7px] px-1">Featured</div>
+                        )}
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); removeExistingImage(img.id); }}
+                          className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white rounded-full flex items-center justify-center text-[8px] hover:bg-red-600"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* New images */}
+                {newImages.length > 0 && (
+                  <div className="flex gap-2 flex-wrap mb-3">
+                    {newImages.map((img, i) => {
+                      const combinedIdx = existingImages.length + i;
+                      return (
+                        <div
+                          key={i}
+                          className={`relative w-20 h-20 rounded overflow-hidden cursor-pointer border-2 ${featuredIndex === combinedIdx ? "border-green-500" : "border-transparent"}`}
+                          onClick={() => setFeaturedIndex(combinedIdx)}
+                        >
+                          <img src={img.preview} alt="" className="w-full h-full object-cover" />
+                          {featuredIndex === combinedIdx && (
+                            <div className="absolute top-0 left-0 bg-green-500 text-white text-[7px] px-1">Featured</div>
+                          )}
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); removeNewImage(i); }}
+                            className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white rounded-full flex items-center justify-center text-[8px] hover:bg-red-600"
+                          >
+                            ✕
+                          </button>
+                          <div className="absolute bottom-0 left-0 right-0 bg-blue-500/80 text-white text-[7px] text-center">New</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Upload button */}
                 <div
-                  className="border-2 border-dashed border-[var(--border)] rounded-md p-6 text-center cursor-pointer hover:border-[var(--text)] transition-colors"
+                  className="border-2 border-dashed border-[var(--border)] rounded-md p-4 text-center cursor-pointer hover:border-[var(--text)] transition-colors"
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  <p className="text-sm text-[var(--text-muted)]">
-                    {images.length > 0 ? `${images.length} images selected` : "Click to add images"}
-                  </p>
-                  <p className="text-[9px] text-[var(--text-muted)] mt-1">JPG, PNG, WebP — first image becomes featured</p>
+                  <p className="text-xs text-[var(--text-muted)]">+ Add more images</p>
                   <input
                     ref={fileInputRef}
                     type="file"
                     accept="image/*"
                     multiple
                     className="hidden"
-                    onChange={(e) => {
-                      if (e.target.files) setImages(Array.from(e.target.files));
-                    }}
+                    onChange={handleFileSelect}
                   />
                 </div>
-                {images.length > 0 && (
-                  <div className="flex gap-2 mt-3 overflow-x-auto">
-                    {images.map((img, i) => (
-                      <div key={i} className="relative w-16 h-16 flex-shrink-0 rounded overflow-hidden">
-                        <img src={URL.createObjectURL(img)} alt="" className="w-full h-full object-cover" />
-                        {i === 0 && (
-                          <div className="absolute top-0 left-0 bg-green-500 text-white text-[7px] px-1">Featured</div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
 
               {/* Actions */}
