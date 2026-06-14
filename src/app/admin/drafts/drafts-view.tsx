@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import AdminHeader from "@/components/AdminHeader";
 
 type Draft = {
   id: string;
@@ -23,8 +24,9 @@ export default function DraftsView() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--bg)] px-8 py-12">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-[var(--bg)]">
+      <AdminHeader />
+      <div className="max-w-4xl mx-auto px-8 pt-20">
         {/* Header */}
         <div className="flex items-center justify-between mb-12">
           <div>

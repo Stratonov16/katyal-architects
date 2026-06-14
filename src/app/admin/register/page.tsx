@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import AdminHeader from "@/components/AdminHeader";
 
 export default function AdminRegister() {
   const [email, setEmail] = useState("");
@@ -50,11 +51,12 @@ export default function AdminRegister() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6 bg-[var(--bg)]">
+    <div className="min-h-screen bg-[var(--bg)]">
+      <AdminHeader />
+      <div className="flex items-center justify-center min-h-screen px-6">
       <div className="w-full max-w-sm">
         <div className="text-center mb-10">
-          <p className="text-2xl font-bold tracking-wider" style={{ fontFamily: "var(--font-display), serif" }}>K</p>
-          <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--text-muted)] mt-2">Create Admin Account</p>
+          <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--text-muted)]">Create Admin Account</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -103,6 +105,7 @@ export default function AdminRegister() {
             </a>
           </p>
         </form>
+      </div>
       </div>
     </div>
   );

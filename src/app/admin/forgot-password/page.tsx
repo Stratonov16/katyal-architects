@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import AdminHeader from "@/components/AdminHeader";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -14,11 +15,12 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6 bg-[var(--bg)]">
+    <div className="min-h-screen bg-[var(--bg)]">
+      <AdminHeader />
+      <div className="flex items-center justify-center min-h-screen px-6">
       <div className="w-full max-w-sm">
         <div className="text-center mb-10">
-          <p className="text-2xl font-bold tracking-wider" style={{ fontFamily: "var(--font-display), serif" }}>K</p>
-          <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--text-muted)] mt-2">Reset Password</p>
+          <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--text-muted)]">Reset Password</p>
         </div>
 
         {sent ? (
@@ -58,6 +60,7 @@ export default function ForgotPassword() {
             </p>
           </form>
         )}
+      </div>
       </div>
     </div>
   );

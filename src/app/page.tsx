@@ -252,7 +252,7 @@ export default function Home() {
               <a href="#projects" className="block hover:text-white transition-colors duration-300">Services</a>
               <a href="#reviews" className="block hover:text-white transition-colors duration-300">Reviews</a>
               <a href="#contact" className="block hover:text-white transition-colors duration-300">Contact</a>
-              <a href="/admin/login" className="block hover:text-white transition-colors duration-300">Admin</a>
+              <a href="/admin" className="block hover:text-white transition-colors duration-300">Admin</a>
             </div>
             <div className="space-y-2 text-sm text-[#a3a3a3]">
               <p className="uppercase tracking-[0.15em] text-[#f5f5f5] text-xs mb-4">Contact</p>

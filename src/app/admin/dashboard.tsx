@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { AuthUser } from "@/lib/auth";
+import AdminHeader from "@/components/AdminHeader";
 
 export default function AdminDashboard({ user }: { user: AuthUser }) {
   const router = useRouter();
@@ -12,6 +13,7 @@ export default function AdminDashboard({ user }: { user: AuthUser }) {
   };
 
   const sections = [
+    { name: "Hero Carousel", href: "/admin/hero", description: "Manage homepage hero images and videos" },
     { name: "Projects", href: "/admin/projects", description: "Add, edit, or remove projects" },
     { name: "Team", href: "/admin/team", description: "Manage team members" },
     { name: "Reviews", href: "/admin/reviews", description: "Manage client testimonials" },
@@ -20,16 +22,14 @@ export default function AdminDashboard({ user }: { user: AuthUser }) {
   ];
 
   return (
-    <div className="min-h-screen bg-[var(--bg)] px-8 py-12">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-[var(--bg)]">
+      <AdminHeader />
+      <div className="max-w-4xl mx-auto px-8 pt-20">
         {/* Header */}
         <div className="flex items-center justify-between mb-12">
-          <div>
-            <a href="/" className="text-2xl font-bold tracking-wider hover:opacity-60 transition-opacity" style={{ fontFamily: "var(--font-display), serif" }}>K</a>
-            <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--text-muted)] mt-1">
-              {user.role === "super_admin" ? "Super Admin" : "Admin"}
-            </p>
-          </div>
+          <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--text-muted)]">
+            {user.role === "super_admin" ? "Super Admin" : "Admin"} Dashboard
+          </p>
           <div className="flex items-center gap-6">
             <a href="/" className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
               View Site →
