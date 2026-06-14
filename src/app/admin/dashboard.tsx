@@ -1,11 +1,28 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 import { AuthUser } from "@/lib/auth";
 import AdminHeader from "@/components/AdminHeader";
 
 export default function AdminDashboard({ user }: { user: AuthUser }) {
   const router = useRouter();
+  const [stats, setStats] = useState({ projects: 0, team: 0, reviews: 0, drafts: 0 });
+
+  useEffect(() => {
+    Promise.all([
+      fetch("/api/admin/projects").then((r) => r.json()),
+      fetch("/api/admin/team").then((r) => r.json()),
+      fetch("/api/admin/reviews").then((r) => r.json()),
+    ]).then(([p, t, r]) => {
+      setStats({
+        projects: p.projects?.length || 0,
+        team: t.members?.length || 0,
+        reviews: r.reviews?.length || 0,
+        drafts: 0,
+      });
+    }).catch(() => {});
+  }, []);
 
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
@@ -49,7 +66,7 @@ export default function AdminDashboard({ user }: { user: AuthUser }) {
         {/* Draft notification for super admin */}
         {user.role === "super_admin" && (
           <div className="mb-8 border border-[var(--review-border)] rounded-md p-4 flex items-center justify-between">
-            <p className="text-sm">0 pending drafts to review</p>
+            <p className="text-sm">{stats.drafts} pending drafts to review</p>
             <a href="/admin/drafts" className="text-[10px] uppercase tracking-[0.2em] hover:opacity-60 transition-opacity">
               View Drafts →
             </a>
@@ -73,15 +90,15 @@ export default function AdminDashboard({ user }: { user: AuthUser }) {
         {/* Quick stats */}
         <div className="mt-12 grid grid-cols-3 gap-4 text-center">
           <div className="border border-[var(--border)] rounded-md p-4">
-            <p className="text-2xl font-light">8</p>
+            <p className="text-2xl font-light">{stats.projects}</p>
             <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] mt-1">Projects</p>
           </div>
           <div className="border border-[var(--border)] rounded-md p-4">
-            <p className="text-2xl font-light">3</p>
+            <p className="text-2xl font-light">{stats.team}</p>
             <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] mt-1">Team</p>
           </div>
           <div className="border border-[var(--border)] rounded-md p-4">
-            <p className="text-2xl font-light">5</p>
+            <p className="text-2xl font-light">{stats.reviews}</p>
             <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] mt-1">Reviews</p>
           </div>
         </div>
