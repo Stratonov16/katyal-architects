@@ -69,7 +69,7 @@ export default function Navbar() {
               onClick={() => { setConnectOpen(!connectOpen); setServicesOpen(false); }}
               className="hover:opacity-60 transition-opacity"
             >
-              CONNECT
+              CONTACT US
             </button>
             {connectOpen && (
               <div className="absolute top-8 right-0 bg-[var(--bg)] border border-[var(--border)] rounded-md shadow-lg p-4 flex flex-col gap-3 min-w-[150px]">
@@ -139,7 +139,7 @@ export default function Navbar() {
               )}
             </div>
             <a href="#careers" onClick={() => setMenuOpen(false)} className="hover:opacity-60 transition-opacity">CAREERS</a>
-            <a href="#contact" onClick={() => setMenuOpen(false)} className="hover:opacity-60 transition-opacity">CONNECT</a>
+            <a href="#contact" onClick={() => setMenuOpen(false)} className="hover:opacity-60 transition-opacity">CONTACT US</a>
             <a href="/admin" onClick={() => setMenuOpen(false)} className="hover:opacity-60 transition-opacity text-[var(--text-muted)]">ADMIN</a>
           </div>
 
