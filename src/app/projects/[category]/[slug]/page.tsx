@@ -1,35 +1,85 @@
 export const runtime = "edge";
 
 import Link from "next/link";
-import { getProjectBySlug, getProjectsByCategory, projects, categories } from "@/lib/projects";
+import { query, queryOne } from "@/lib/db";
 import Navbar from "@/components/Navbar";
+
+const categories = [
+  { name: "Residential", slug: "residential" },
+  { name: "Hospitality", slug: "hospitality" },
+  { name: "Interiors", slug: "interiors" },
+  { name: "Landscape", slug: "landscape" },
+  { name: "Commercial", slug: "commercial" },
+  { name: "Township", slug: "township" },
+];
+
+type Project = {
+  id: number;
+  title: string;
+  slug: string;
+  category: string;
+  description: string;
+  location: string;
+  year: number;
+  video_url: string;
+};
+
+type ProjectImage = {
+  image_url: string;
+  is_featured: number;
+};
 
 export default async function ProjectPage({ params }: { params: Promise<{ category: string; slug: string }> }) {
   const { category, slug } = await params;
-  const project = getProjectBySlug(slug);
-  const categoryProjects = getProjectsByCategory(category);
-  const currentIndex = categoryProjects.findIndex((p) => p.slug === slug);
-  const prevProject = categoryProjects[currentIndex - 1];
-  const nextProject = categoryProjects[currentIndex + 1];
+
+  const project = await queryOne<Project>(
+    `SELECT * FROM projects WHERE slug = ? AND status = 'published'`,
+    [slug]
+  );
 
   if (!project) {
     return (
       <>
         <Navbar />
         <main className="pt-20 px-8 min-h-screen flex items-center justify-center">
-          <p className="text-[var(--text-muted)]">Project not found.</p>
+          <div className="text-center">
+            <p className="text-[var(--text-muted)]">Project not found.</p>
+            <Link href={`/projects/${category}`} className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] hover:text-[var(--text)] mt-4 inline-block">
+              ← Back to {categories.find((c) => c.slug === category)?.name}
+            </Link>
+          </div>
         </main>
       </>
     );
   }
+
+  const images = await query<ProjectImage>(
+    `SELECT image_url, is_featured FROM project_images WHERE project_id = ? ORDER BY "order" ASC`,
+    [project.id]
+  );
+
+  const categoryProjects = await query<Project>(
+    `SELECT id, title, slug FROM projects WHERE category = ? AND status = 'published' ORDER BY created_at DESC`,
+    [category]
+  );
+
+  const currentIndex = categoryProjects.findIndex((p) => p.slug === slug);
+  const prevProject = categoryProjects[currentIndex - 1];
+  const nextProject = categoryProjects[currentIndex + 1];
+
+  const featuredImage = images.find((img) => img.is_featured)?.image_url || images[0]?.image_url;
 
   return (
     <>
       <Navbar />
       <main className="pt-20 min-h-screen">
         {/* Hero image */}
-        <div className="relative w-full h-[60vh] md:h-[75vh] bg-[var(--border)]">
-          {/* Project image will go here */}
+        <div className="relative w-full h-[60vh] md:h-[75vh]">
+          {featuredImage ? (
+            <img src={featuredImage} alt={project.title} className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full bg-[var(--border)]" />
+          )}
           <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12 bg-gradient-to-t from-black/70 to-transparent">
             <p className="text-[10px] uppercase tracking-[0.3em] text-white/60 mb-2">
               <Link href={`/projects/${category}`} className="hover:text-white transition-colors">
@@ -64,16 +114,27 @@ export default async function ProjectPage({ params }: { params: Promise<{ catego
           </div>
 
           {/* Description */}
-          <p className="text-lg md:text-xl font-light leading-relaxed max-w-2xl">
-            {project.description}
-          </p>
+          {project.description && (
+            <p className="text-lg md:text-xl font-light leading-relaxed max-w-2xl">
+              {project.description}
+            </p>
+          )}
 
-          {/* Image gallery placeholder */}
-          <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-4">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="aspect-[4/3] bg-[var(--border)] rounded-md" />
-            ))}
-          </div>
+          {/* Video */}
+          {project.video_url && (
+            <div className="mt-12 aspect-video rounded-md overflow-hidden">
+              <video src={project.video_url} className="w-full h-full object-cover" controls />
+            </div>
+          )}
+
+          {/* Image gallery */}
+          {images.length > 0 && (
+            <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-4">
+              {images.map((img, i) => (
+                <img key={i} src={img.image_url} alt={`${project.title} ${i + 1}`} className="w-full aspect-[4/3] object-cover rounded-md" />
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Prev / Next navigation */}
