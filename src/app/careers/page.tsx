@@ -1,8 +1,14 @@
 export const runtime = "edge";
 
+import type { Metadata } from "next";
 import Link from "next/link";
 import { query } from "@/lib/db";
 import Navbar from "@/components/Navbar";
+
+export const metadata: Metadata = {
+  title: "Careers",
+  description: "Join Katyal Architects. We're looking for passionate architects, designers, and creative minds.",
+};
 
 type Job = {
   id: number;
