@@ -7,6 +7,7 @@ import { useEffect, useRef, useCallback, useState } from "react";
 export default function Home() {
   const sectionsRef = useRef<HTMLDivElement>(null);
   const reviewIndex = useRef(0);
+  const [scrollProgress, setScrollProgress] = useState(0);
   const [heroSlides, setHeroSlides] = useState<{image_url: string; project_title: string; project_link: string}[]>([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [about, setAbout] = useState<{headline: string; description: string; photo_url: string} | null>(null);
@@ -63,6 +64,20 @@ export default function Home() {
     const sections = sectionsRef.current?.querySelectorAll(".reveal");
     sections?.forEach((el) => observer.observe(el));
 
+    // Also observe grow elements
+    const growElements = sectionsRef.current?.querySelectorAll(".reveal-grow");
+    growElements?.forEach((el) => observer.observe(el));
+
+    // Scroll progress
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      setScrollProgress(progress);
+    };
+    window.addEventListener("scroll", handleScroll);
+    handleScroll();
+
     // Review auto-slide
     const interval = setInterval(() => slideReviews(1), 4000);
 
@@ -76,6 +91,7 @@ export default function Home() {
 
     return () => {
       observer.disconnect();
+      window.removeEventListener("scroll", handleScroll);
       clearInterval(interval);
       prev?.removeEventListener("click", handlePrev);
       next?.removeEventListener("click", handleNext);
@@ -85,6 +101,9 @@ export default function Home() {
   return (
     <>
       <Navbar />
+
+      {/* Scroll progress bar */}
+      <div className="scroll-progress" style={{ width: `${scrollProgress}%` }} />
 
       <main className="" ref={sectionsRef}>
         {/* 1. Hero — Auto-rotating Project Carousel */}
@@ -154,7 +173,7 @@ export default function Home() {
         </section>
 
         {/* 3. Projects — Grid of Rectangular Boxes */}
-        <section id="projects" className="reveal py-24 px-8">
+        <section id="projects" className="reveal-grow py-24 px-8">
           <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-muted)] mb-12 text-center">Services</p>
           <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
             {[
@@ -184,7 +203,7 @@ export default function Home() {
         </section>
 
         {/* 4. Instagram Feed */}
-        <section id="instagram" className="reveal py-24 px-8">
+        <section id="instagram" className="reveal-grow py-24 px-8">
           <div className="max-w-6xl mx-auto">
             <div className="flex items-center justify-between mb-12">
               <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-muted)]">@katyal_architects</p>
