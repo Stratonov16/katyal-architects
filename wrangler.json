@@ -8,5 +8,14 @@
       "database_name": "katyal-architects-db",
       "database_id": "5b76706e-5630-4d45-a1a8-2fc459db83b7"
     }
-  ]
+  ],
+  "r2_buckets": [
+    {
+      "binding": "BUCKET",
+      "bucket_name": "katyal-architects-media"
+    }
+  ],
+  "vars": {
+    "R2_PUBLIC_URL": "https://pub-79d22fbf37e444a896d6acc795f2444b.r2.dev"
+  }
 }
