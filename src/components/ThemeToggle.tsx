@@ -3,12 +3,14 @@
 import { useEffect, useState } from "react";
 
 export default function ThemeToggle() {
-  const [dark, setDark] = useState(false);
+  const [dark, setDark] = useState(true);
 
   useEffect(() => {
     const saved = localStorage.getItem("theme");
-    if (saved === "dark") {
-      setDark(true);
+    if (saved === "light") {
+      setDark(false);
+      document.documentElement.setAttribute("data-theme", "light");
+    } else {
       document.documentElement.setAttribute("data-theme", "dark");
     }
   }, []);

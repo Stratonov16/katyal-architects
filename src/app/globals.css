@@ -12,6 +12,7 @@
   --border: #e5e5e5;
   --follow-bg: #f0eef6;
   --follow-text: #5b4a9e;
+  --review-border: #1a1a1a;
 }
 
 [data-theme="dark"] {
@@ -21,6 +22,7 @@
   --border: #262626;
   --follow-bg: #1e1b2e;
   --follow-text: #a78bfa;
+  --review-border: #c9a84c;
 }
 
 body {
@@ -50,3 +52,4 @@ h1, h2, h3, h4, h5, h6 {
 html {
   scroll-behavior: smooth;
 }
+

@@ -1,10 +1,29 @@
 "use client";
 
 import Navbar from "@/components/Navbar";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 
 export default function Home() {
   const sectionsRef = useRef<HTMLDivElement>(null);
+  const reviewIndex = useRef(0);
+
+  const slideReviews = useCallback((direction: number) => {
+    const slider = document.querySelector(".review-slider") as HTMLElement;
+    if (!slider) return;
+    const isMobile = window.innerWidth < 768;
+    const step = isMobile ? 1 : 3;
+    const total = 5;
+    const maxIndex = isMobile ? total - 1 : Math.ceil(total / 3) - 1;
+
+    reviewIndex.current += direction;
+    if (reviewIndex.current > maxIndex) reviewIndex.current = 0;
+    if (reviewIndex.current < 0) reviewIndex.current = maxIndex;
+
+    const offset = isMobile
+      ? reviewIndex.current * -100
+      : reviewIndex.current * -100;
+    slider.style.transform = `translateX(${offset}%)`;
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -21,8 +40,24 @@ export default function Home() {
     const sections = sectionsRef.current?.querySelectorAll(".reveal");
     sections?.forEach((el) => observer.observe(el));
 
-    return () => observer.disconnect();
-  }, []);
+    // Review auto-slide
+    const interval = setInterval(() => slideReviews(1), 4000);
+
+    // Arrow click handlers
+    const prev = document.querySelector(".review-prev");
+    const next = document.querySelector(".review-next");
+    const handlePrev = () => slideReviews(-1);
+    const handleNext = () => slideReviews(1);
+    prev?.addEventListener("click", handlePrev);
+    next?.addEventListener("click", handleNext);
+
+    return () => {
+      observer.disconnect();
+      clearInterval(interval);
+      prev?.removeEventListener("click", handlePrev);
+      next?.removeEventListener("click", handleNext);
+    };
+  }, [slideReviews]);
 
   return (
     <>
@@ -71,11 +106,11 @@ export default function Home() {
         {/* 3. Projects — Grid of Rectangular Boxes */}
         <section id="projects" className="reveal py-24 px-8">
           <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-muted)] mb-12 text-center">Services</p>
-          <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-3 gap-5">
+          <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
             {[
+              { category: "Residential", slug: "residential" },
               { category: "Hospitality", slug: "hospitality" },
-              { category: "Architecture", slug: "architecture" },
-              { category: "Interior", slug: "interior" },
+              { category: "Interiors", slug: "interiors" },
               { category: "Landscape", slug: "landscape" },
               { category: "Commercial", slug: "commercial" },
               { category: "Township", slug: "township" },
@@ -83,10 +118,14 @@ export default function Home() {
               <a
                 key={item.slug}
                 href={`/projects/${item.slug}`}
-                className="group relative aspect-[4/3] rounded-lg flex items-center justify-center overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                className="group relative aspect-[4/3] rounded-md overflow-hidden"
               >
-                <div className="absolute inset-0 bg-[var(--border)] group-hover:bg-[var(--text)] transition-colors duration-300" />
-                <p className="relative z-10 text-xs md:text-sm uppercase tracking-[0.2em] text-[var(--text)] group-hover:text-[var(--bg)] transition-colors duration-300">
+                {/* Background image placeholder */}
+                <div className="absolute inset-0 bg-[var(--border)] group-hover:scale-105 transition-transform duration-500" />
+                {/* Dark overlay for text readability */}
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-300" />
+                {/* Category name at bottom */}
+                <p className="absolute bottom-4 left-4 z-10 text-[11px] md:text-xs uppercase tracking-[0.2em] text-white font-light">
                   {item.category}
                 </p>
               </a>
@@ -109,43 +148,61 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 5. Reviews */}
-        <section id="reviews" className="reveal py-24 overflow-hidden">
+        {/* 5. Reviews — One card at a time, auto-transitions, arrows */}
+        <section id="reviews" className="reveal py-24">
           <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-muted)] text-center mb-12">Happy Clients</p>
-          <div className="max-w-5xl mx-auto px-8">
-            <div className="flex gap-5 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-4">
-              {[
-                { name: "Client Name", project: "Residential Villa", quote: "Working with Katyal Architects transformed our vision into reality. Every detail was considered." },
-                { name: "Another Client", project: "Smile Salon", quote: "The design exceeded our expectations. A truly world-class experience." },
-                { name: "Client Three", project: "Heritage Restoration", quote: "They understood our brief instantly and delivered beyond what we imagined." },
-                { name: "Client Four", project: "Urban Township", quote: "A seamless experience from concept to completion. Highly recommended." },
-                { name: "Client Five", project: "Boutique Hotel", quote: "Their attention to detail and understanding of space is unmatched." },
-              ].map((review) => (
-                <div key={review.name} className="w-[85vw] md:w-[calc(33.333%-14px)] flex-shrink-0 snap-center rounded-lg border border-[var(--border)] p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
-                  <p className="text-sm font-light italic leading-relaxed">&ldquo;{review.quote}&rdquo;</p>
-                  <div className="mt-5">
-                    <p className="text-xs uppercase tracking-[0.1em]">{review.name}</p>
-                    <p className="text-[10px] text-[var(--text-muted)] mt-1">{review.project}</p>
+          <div className="max-w-5xl mx-auto px-8 relative">
+            {/* Left arrow */}
+            <button className="review-prev absolute -left-2 md:left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full flex items-center justify-center hover:opacity-60 transition-all duration-300">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
+            </button>
+
+            {/* Cards container — shows one at a time on mobile, 3 on desktop */}
+            <div className="overflow-hidden mx-8 md:mx-12">
+              <div className="review-slider flex transition-transform duration-500 ease-in-out">
+                {[
+                  { name: "Client Name", project: "Residential Villa", quote: "Working with Katyal Architects transformed our vision into reality. Every detail was considered." },
+                  { name: "Another Client", project: "Smile Salon", quote: "The design exceeded our expectations. A truly world-class experience." },
+                  { name: "Client Three", project: "Heritage Restoration", quote: "They understood our brief instantly and delivered beyond what we imagined." },
+                  { name: "Client Four", project: "Urban Township", quote: "A seamless experience from concept to completion. Highly recommended." },
+                  { name: "Client Five", project: "Boutique Hotel", quote: "Their attention to detail and understanding of space is unmatched." },
+                ].map((review) => (
+                  <div key={review.name} className="w-full md:w-1/3 flex-shrink-0 px-2">
+                    <div className="rounded-lg border border-[var(--review-border)] p-6 flex flex-col justify-between h-full shadow-sm">
+                      <p className="text-sm font-light italic leading-relaxed">&ldquo;{review.quote}&rdquo;</p>
+                      <div className="mt-5 flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-full bg-[var(--border)] flex-shrink-0" />
+                        <div>
+                          <p className="text-xs uppercase tracking-[0.1em]">{review.name}</p>
+                          <p className="text-[10px] text-[var(--text-muted)] mt-0.5">{review.project}</p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
+
+            {/* Right arrow */}
+            <button className="review-next absolute -right-2 md:right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full flex items-center justify-center hover:opacity-60 transition-all duration-300">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+            </button>
           </div>
         </section>
 
         {/* 6. Team */}
         <section id="team" className="reveal py-24 px-8">
           <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-muted)] text-center mb-12">Our Team</p>
-          <div className="flex justify-center gap-8 md:gap-12 overflow-x-auto">
+          <div className="grid grid-cols-3 gap-4 max-w-sm md:max-w-2xl mx-auto px-4">
             {[
               { name: "Shubham Katyal", role: "Founder & Principal Architect" },
-              { name: "Shelly Katyal", role: "Designer & Vastu" },
+              { name: "Shelly Katyal", role: "Designer" },
               { name: "Oreo", role: "Chief Happiness Officer" },
             ].map((member) => (
-              <div key={member.name} className="text-center group cursor-pointer flex-shrink-0">
-                <div className="w-20 h-20 md:w-28 md:h-28 rounded-full bg-[var(--border)] mx-auto mb-4 shadow-sm group-hover:shadow-md transition-all duration-300 group-hover:-translate-y-1 group-hover:scale-105" />
-                <p className="text-xs md:text-sm uppercase tracking-[0.1em]">{member.name}</p>
-                <p className="text-[10px] md:text-xs text-[var(--text-muted)] mt-1">{member.role}</p>
+              <div key={member.name} className="text-center group cursor-pointer">
+                <div className="w-16 h-16 md:w-28 md:h-28 bg-[var(--border)] mx-auto mb-3 rounded-full shadow-sm group-hover:shadow-md transition-all duration-300 group-hover:-translate-y-1 group-hover:scale-105 grayscale group-hover:grayscale-0" />
+                <p className="text-[9px] md:text-sm uppercase tracking-[0.05em]">{member.name}</p>
+                <p className="text-[8px] md:text-xs text-[var(--text-muted)] mt-1">{member.role}</p>
               </div>
             ))}
           </div>
@@ -158,7 +215,10 @@ export default function Home() {
           <form className="w-full max-w-lg mx-auto space-y-6">
             <input type="text" placeholder="Name" className="w-full bg-transparent border-b border-[var(--border)] py-3 text-sm outline-none focus:border-[var(--text)] transition-colors duration-300" />
             <input type="email" placeholder="Email" className="w-full bg-transparent border-b border-[var(--border)] py-3 text-sm outline-none focus:border-[var(--text)] transition-colors duration-300" />
-            <input type="tel" placeholder="Phone" className="w-full bg-transparent border-b border-[var(--border)] py-3 text-sm outline-none focus:border-[var(--text)] transition-colors duration-300" />
+            <div className="flex items-center border-b border-[var(--border)] focus-within:border-[var(--text)] transition-colors duration-300 [&:has(input:invalid:not(:placeholder-shown))]:border-red-500">
+              <span className="text-sm text-[var(--text-muted)] pr-2">+91</span>
+              <input type="tel" pattern="[0-9]{10}" maxLength={10} placeholder="Phone Number" className="w-full bg-transparent py-3 text-sm outline-none invalid:[&:not(:placeholder-shown)]:text-red-500" onInput={(e) => { e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, ''); }} />
+            </div>
             <select className="w-full bg-transparent border-b border-[var(--border)] py-3 text-sm outline-none focus:border-[var(--text)] transition-colors duration-300 text-[var(--text-muted)]">
               <option value="">Select Service</option>
               <option>Hospitality Design</option>
@@ -170,9 +230,11 @@ export default function Home() {
               <option>Others</option>
             </select>
             <input type="text" placeholder="Location" className="w-full bg-transparent border-b border-[var(--border)] py-3 text-sm outline-none focus:border-[var(--text)] transition-colors duration-300" />
-            <button type="submit" className="mt-8 text-xs uppercase tracking-[0.3em] border border-[var(--text)] px-8 py-4 rounded-md hover:bg-[var(--text)] hover:text-[var(--bg)] transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
-              Get Quote Now
-            </button>
+            <div className="flex justify-center mt-8">
+              <button type="submit" className="text-xs uppercase tracking-[0.3em] border border-[var(--text)] px-8 py-4 rounded-md hover:bg-[var(--text)] hover:text-[var(--bg)] transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
+                Get Quote Now
+              </button>
+            </div>
           </form>
         </section>
 
@@ -191,6 +253,7 @@ export default function Home() {
             </div>
             <div className="space-y-2 text-sm text-[#a3a3a3]">
               <p className="uppercase tracking-[0.15em] text-[#f5f5f5] text-xs mb-4">Contact</p>
+              <a href="https://maps.app.goo.gl/iuc8RB88AatwJu827" target="_blank" className="text-[#a3a3a3] hover:text-white transition-colors duration-300 block">2/108 Housing Board Colony, Hanumangarh, Rajasthan</a>
               <p className="text-[#a3a3a3]">ar.shubhamkatyal@gmail.com</p>
               <p className="text-[#a3a3a3]">+91 6377432778</p>
               <div className="flex items-center gap-3 mt-3">
