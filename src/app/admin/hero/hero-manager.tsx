@@ -217,7 +217,11 @@ export default function HeroManager({ userRole }: { userRole: string }) {
             </h1>
           </div>
           <div className="flex items-center gap-4">
-            {message && <p className="text-xs text-[var(--text-muted)]">{message}</p>}
+            {message && (
+              <p className={`text-xs px-3 py-1.5 rounded ${message.includes("fail") || message.includes("Failed") ? "bg-red-500/10 text-red-500" : "bg-green-500/10 text-green-500"}`}>
+                {message}
+              </p>
+            )}
             <button
               onClick={handlePublish}
               disabled={slides.length === 0 || saving}
