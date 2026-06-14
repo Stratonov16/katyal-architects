@@ -39,30 +39,38 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Title and category required" }, { status: 400 });
   }
 
-  const status = user.role === "super_admin" ? "published" : "draft";
+  if (user.role === "super_admin") {
+    await execute(
+      `INSERT INTO projects (title, slug, category, description, location, year, video_url, status, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, 'published', ?)`,
+      [title, slug, category, description || "", location || "", year || 2026, video_url || "", user.email]
+    );
 
-  await execute(
-    `INSERT INTO projects (title, slug, category, description, location, year, video_url, status, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [title, slug, category, description || "", location || "", year || 2026, video_url || "", status, user.email]
-  );
+    const project = await query<{ id: number }>(
+      `SELECT id FROM projects WHERE slug = ? ORDER BY created_at DESC LIMIT 1`,
+      [slug]
+    );
 
-  const project = await query<{ id: number }>(
-    `SELECT id FROM projects WHERE slug = ? ORDER BY created_at DESC LIMIT 1`,
-    [slug]
-  );
-
-  if (project.length > 0 && newImages && newImages.length > 0) {
-    const projectId = project[0].id;
-    for (let i = 0; i < newImages.length; i++) {
-      const isFeatured = newImages[i] === featuredUrl ? 1 : 0;
-      await execute(
-        `INSERT INTO project_images (project_id, image_url, is_featured, "order") VALUES (?, ?, ?, ?)`,
-        [projectId, newImages[i], isFeatured, i]
-      );
+    if (project.length > 0 && newImages && newImages.length > 0) {
+      const projectId = project[0].id;
+      for (let i = 0; i < newImages.length; i++) {
+        const isFeatured = newImages[i] === featuredUrl ? 1 : 0;
+        await execute(
+          `INSERT INTO project_images (project_id, image_url, is_featured, "order") VALUES (?, ?, ?, ?)`,
+          [projectId, newImages[i], isFeatured, i]
+        );
+      }
     }
-  }
 
-  return NextResponse.json({ success: true, message: status === "published" ? "Published!" : "Saved as draft" });
+    return NextResponse.json({ success: true, message: "Published!" });
+  } else {
+    // Client admin — save to drafts for approval
+    const draftData = JSON.stringify({ title, slug, category, location, year, description, video_url, images: newImages, featuredUrl });
+    await execute(
+      `INSERT INTO drafts (type, action, data, submitted_by, status) VALUES ('project', 'create', ?, ?, 'pending')`,
+      [draftData, user.email]
+    );
+    return NextResponse.json({ success: true, message: "Submitted for approval" });
+  }
 }
 
 // PUT — update project
@@ -74,40 +82,48 @@ export async function PUT(request: NextRequest) {
 
   if (!id) return NextResponse.json({ error: "Project ID required" }, { status: 400 });
 
-  const status = user.role === "super_admin" ? "published" : "draft";
+  if (user.role === "super_admin") {
+    await execute(
+      `UPDATE projects SET title=?, slug=?, category=?, description=?, location=?, year=?, video_url=?, status='published', updated_at=datetime('now') WHERE id=?`,
+      [title, slug, category, description || "", location || "", year || 2026, video_url || "", id]
+    );
 
-  await execute(
-    `UPDATE projects SET title=?, slug=?, category=?, description=?, location=?, year=?, video_url=?, status=?, updated_at=datetime('now') WHERE id=?`,
-    [title, slug, category, description || "", location || "", year || 2026, video_url || "", status, id]
-  );
-
-  // Delete removed images
-  if (deletedImageIds && deletedImageIds.length > 0) {
-    for (const imgId of deletedImageIds) {
-      await execute(`DELETE FROM project_images WHERE id=? AND project_id=?`, [imgId, id]);
+    // Delete removed images
+    if (deletedImageIds && deletedImageIds.length > 0) {
+      for (const imgId of deletedImageIds) {
+        await execute(`DELETE FROM project_images WHERE id=? AND project_id=?`, [imgId, id]);
+      }
     }
-  }
 
-  // Add new images
-  if (newImages && newImages.length > 0) {
-    const existing = await query<{ id: number }>(`SELECT id FROM project_images WHERE project_id=?`, [id]);
-    const startOrder = existing.length;
-    for (let i = 0; i < newImages.length; i++) {
-      const isFeatured = newImages[i] === featuredUrl ? 1 : 0;
-      await execute(
-        `INSERT INTO project_images (project_id, image_url, is_featured, "order") VALUES (?, ?, ?, ?)`,
-        [id, newImages[i], isFeatured, startOrder + i]
-      );
+    // Add new images
+    if (newImages && newImages.length > 0) {
+      const existing = await query<{ id: number }>(`SELECT id FROM project_images WHERE project_id=?`, [id]);
+      const startOrder = existing.length;
+      for (let i = 0; i < newImages.length; i++) {
+        const isFeatured = newImages[i] === featuredUrl ? 1 : 0;
+        await execute(
+          `INSERT INTO project_images (project_id, image_url, is_featured, "order") VALUES (?, ?, ?, ?)`,
+          [id, newImages[i], isFeatured, startOrder + i]
+        );
+      }
     }
-  }
 
-  // Update featured flag on existing images
-  if (featuredUrl) {
-    await execute(`UPDATE project_images SET is_featured=0 WHERE project_id=?`, [id]);
-    await execute(`UPDATE project_images SET is_featured=1 WHERE project_id=? AND image_url=?`, [id, featuredUrl]);
-  }
+    // Update featured flag on existing images
+    if (featuredUrl) {
+      await execute(`UPDATE project_images SET is_featured=0 WHERE project_id=?`, [id]);
+      await execute(`UPDATE project_images SET is_featured=1 WHERE project_id=? AND image_url=?`, [id, featuredUrl]);
+    }
 
-  return NextResponse.json({ success: true, message: "Updated!" });
+    return NextResponse.json({ success: true, message: "Updated!" });
+  } else {
+    // Client admin — save edit to drafts
+    const draftData = JSON.stringify({ id, title, slug, category, location, year, description, video_url, newImages, deletedImageIds, featuredUrl });
+    await execute(
+      `INSERT INTO drafts (type, action, reference_id, data, submitted_by, status) VALUES ('project', 'edit', ?, ?, ?, 'pending')`,
+      [id, draftData, user.email]
+    );
+    return NextResponse.json({ success: true, message: "Edit submitted for approval" });
+  }
 }
 
 // DELETE — delete project
