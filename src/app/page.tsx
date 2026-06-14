@@ -149,7 +149,7 @@ export default function Home() {
         </section>
 
         {/* 5. Reviews — One card at a time, auto-transitions, arrows */}
-        <section id="reviews" className="reveal py-24">
+        <section id="reviews" className="reveal py-12">
           <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-muted)] text-center mb-12">Happy Clients</p>
           <div className="max-w-5xl mx-auto px-8 relative">
             {/* Left arrow */}
@@ -168,14 +168,14 @@ export default function Home() {
                   { name: "Client Five", project: "Boutique Hotel", quote: "Their attention to detail and understanding of space is unmatched." },
                 ].map((review) => (
                   <div key={review.name} className="w-full md:w-1/3 flex-shrink-0 px-2">
-                    <div className="rounded-lg border border-[var(--review-border)] p-6 flex flex-col justify-between h-full shadow-sm">
-                      <p className="text-sm font-light italic leading-relaxed">&ldquo;{review.quote}&rdquo;</p>
-                      <div className="mt-5 flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-[var(--border)] flex-shrink-0" />
+                    <div className="rounded-lg border border-[var(--review-border)] p-8 flex flex-col justify-between h-full shadow-sm">
+                      <p className="text-base font-light italic leading-relaxed">&ldquo;{review.quote}&rdquo;</p>
+                      <div className="mt-6 flex items-center justify-between">
                         <div>
                           <p className="text-xs uppercase tracking-[0.1em]">{review.name}</p>
                           <p className="text-[10px] text-[var(--text-muted)] mt-0.5">{review.project}</p>
                         </div>
+                        <div className="w-10 h-10 rounded-full bg-[var(--border)] flex-shrink-0" />
                       </div>
                     </div>
                   </div>
@@ -191,7 +191,7 @@ export default function Home() {
         </section>
 
         {/* 6. Team */}
-        <section id="team" className="reveal py-24 px-8">
+        <section id="team" className="reveal py-16 px-8">
           <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-muted)] text-center mb-12">Our Team</p>
           <div className="grid grid-cols-3 gap-4 max-w-sm md:max-w-2xl mx-auto px-4">
             {[
@@ -253,7 +253,10 @@ export default function Home() {
             </div>
             <div className="space-y-2 text-sm text-[#a3a3a3]">
               <p className="uppercase tracking-[0.15em] text-[#f5f5f5] text-xs mb-4">Contact</p>
-              <a href="https://maps.app.goo.gl/iuc8RB88AatwJu827" target="_blank" className="text-[#a3a3a3] hover:text-white transition-colors duration-300 block">2/108 Housing Board Colony, Hanumangarh, Rajasthan</a>
+              <a href="https://maps.app.goo.gl/iuc8RB88AatwJu827" target="_blank" className="text-[#a3a3a3] hover:text-white transition-colors duration-300 flex items-center gap-2">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
+                2/108 Housing Board Colony, Hanumangarh, Rajasthan ↗
+              </a>
               <p className="text-[#a3a3a3]">ar.shubhamkatyal@gmail.com</p>
               <p className="text-[#a3a3a3]">+91 6377432778</p>
               <div className="flex items-center gap-3 mt-3">
