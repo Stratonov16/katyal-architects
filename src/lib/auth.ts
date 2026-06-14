@@ -1,5 +1,15 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
+import { getRequestContext } from "@cloudflare/next-on-pages";
+
+function getEnv(key: string): string {
+  try {
+    const { env } = getRequestContext();
+    return (env as unknown as Record<string, string>)[key] || process.env[key] || "";
+  } catch {
+    return process.env[key] || "";
+  }
+}
 
 export type UserRole = "super_admin" | "client_admin";
 
@@ -8,7 +18,9 @@ export type AuthUser = {
   role: UserRole;
 };
 
-const secret = new TextEncoder().encode(process.env.JWT_SECRET || "fallback-secret");
+function getSecret() {
+  return new TextEncoder().encode(getEnv("JWT_SECRET") || "fallback-secret");
+}
 
 // Rate limiting
 const RATE_LIMIT_MAP = new Map<string, { attempts: number; lockedUntil: number }>();
@@ -45,8 +57,8 @@ export function resetAttempts(ip: string): void {
 // Super admin check (env vars only)
 export function validateSuperAdmin(email: string, password: string): AuthUser | null {
   if (
-    email === process.env.SUPER_ADMIN_EMAIL &&
-    password === process.env.SUPER_ADMIN_PASSWORD
+    email === getEnv("SUPER_ADMIN_EMAIL") &&
+    password === getEnv("SUPER_ADMIN_PASSWORD")
   ) {
     return { email, role: "super_admin" };
   }
@@ -84,12 +96,12 @@ export async function createToken(user: AuthUser): Promise<string> {
   return new SignJWT({ email: user.email, role: user.role })
     .setProtectedHeader({ alg: "HS256" })
     .setExpirationTime("7d")
-    .sign(secret);
+    .sign(getSecret());
 }
 
 export async function verifyToken(token: string): Promise<AuthUser | null> {
   try {
-    const { payload } = await jwtVerify(token, secret);
+    const { payload } = await jwtVerify(token, getSecret());
     return { email: payload.email as string, role: payload.role as UserRole };
   } catch {
     return null;
