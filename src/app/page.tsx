@@ -297,9 +297,9 @@ export default function Home() {
             ]).map((member) => (
               <div key={member.name} className="text-center group cursor-pointer">
                 {member.photo_url ? (
-                  <img src={member.photo_url} alt={member.name} className="w-16 h-16 md:w-28 md:h-28 mx-auto mb-3 rounded-full object-cover shadow-sm group-hover:shadow-md transition-all duration-300 group-hover:-translate-y-1 group-hover:scale-105 grayscale group-hover:grayscale-0" />
+                  <img src={member.photo_url} alt={member.name} className="w-16 h-16 md:w-28 md:h-28 mx-auto mb-3 rounded-full object-cover shadow-sm group-hover:shadow-md group-active:shadow-md transition-all duration-300 group-hover:-translate-y-1 group-hover:scale-105 group-active:scale-105 grayscale group-hover:grayscale-0 group-active:grayscale-0" />
                 ) : (
-                  <div className="w-16 h-16 md:w-28 md:h-28 bg-[var(--border)] mx-auto mb-3 rounded-full shadow-sm group-hover:shadow-md transition-all duration-300 group-hover:-translate-y-1 group-hover:scale-105 grayscale group-hover:grayscale-0" />
+                  <div className="w-16 h-16 md:w-28 md:h-28 bg-[var(--border)] mx-auto mb-3 rounded-full shadow-sm group-hover:shadow-md group-active:shadow-md transition-all duration-300 group-hover:-translate-y-1 group-hover:scale-105 group-active:scale-105 grayscale group-hover:grayscale-0 group-active:grayscale-0" />
                 )}
                 <p className="text-[9px] md:text-sm uppercase tracking-[0.05em]">{member.name}</p>
                 <p className="text-[8px] md:text-xs text-[var(--text-muted)] mt-1">{member.role}</p>
