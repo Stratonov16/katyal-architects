@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import ThemeToggle from "./ThemeToggle";
+import Logo from "./Logo";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -36,8 +37,8 @@ export default function Navbar() {
         </button>
 
         {/* Logo — left (desktop) */}
-        <a href="/" className="hidden md:block text-lg font-bold tracking-wider leading-none" style={{ fontFamily: "var(--font-display), serif" }}>
-          K
+        <a href="/" className="hidden md:block">
+          <Logo size="sm" />
         </a>
 
         {/* Nav links — center (desktop only) */}
@@ -156,7 +157,7 @@ export default function Navbar() {
 
           {/* Logo + info at bottom */}
           <div className="mt-auto">
-            <p className="text-2xl font-bold tracking-wider mb-4" style={{ fontFamily: "var(--font-display), serif" }}>K</p>
+            <div className="mb-4"><Logo size="lg" /></div>
             <div className="text-[10px] text-[var(--text-muted)] space-y-2">
               <p>@katyal_architects</p>
               <p>ar.shubhamkatyal@gmail.com</p>
