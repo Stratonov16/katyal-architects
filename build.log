@@ -1,0 +1,45 @@
+⚡️ @cloudflare/next-on-pages CLI v.1.13.16
+⚡️ Detected Package Manager: npm (10.9.8)
+⚡️ Preparing project...
+⚡️ Project is ready
+⚡️ Building project...
+▲  Vercel CLI 54.14.0 (Node.js 22.22.3)
+▲  WARNING! Build not running on Vercel. System environment variables will not be available.
+▲  WARNING: You should not upload the `.next` directory.
+▲  Installing dependencies...
+▲  added 1 package in 563ms
+▲  151 packages are looking for funding
+▲  run `npm fund` for details
+▲  Detected Next.js version: 16.2.9
+▲  Running "npm run build"
+▲  > katyal-architects@0.1.0 build
+▲  > next build
+▲  ⚠ Found lockfile missing swc dependencies, run next locally to automatically patch
+▲  ▲ Next.js 16.2.9 (Turbopack)
+▲  - Environments: .env.local
+▲  Creating an optimized production build ...
+▲  ⚠ Found lockfile missing swc dependencies, run next locally to automatically patch
+▲  ✓ Compiled successfully in 1827ms
+▲  Running TypeScript ...
+▲  Failed to type check.
+▲  ./src/components/VideoUploader.tsx:70:40
+▲  Type error: Type 'FileData' is not assignable to type 'BlobPart'.
+▲  Type 'Uint8Array<ArrayBufferLike>' is not assignable to type 'BlobPart'.
+▲    Type 'Uint8Array<ArrayBufferLike>' is not assignable to type 'ArrayBufferView<ArrayBuffer>'.
+▲      Types of property 'buffer' are incompatible.
+▲        Type 'ArrayBufferLike' is not assignable to type 'ArrayBuffer'.
+▲          Type 'SharedArrayBuffer' is missing the following properties from type 'ArrayBuffer': resizable, resize, detached, transfer, transferToFixedLength
+▲  
+▲  [90m68 |[0m
+▲  [90m69 |[0m       [36mconst[0m data = [36mawait[0m ffmpeg.readFile(outputName);
+▲  [31m[1m>[0m [90m70 |[0m       [36mconst[0m compressedFile = [36mnew[0m [33mFile[0m([data], preview.file.name, { [36mtype[0m: [32m"video/mp4"[0m });
+▲  [90m   |[0m                                        [31m[1m^[0m
+▲  [90m71 |[0m
+▲  [90m72 |[0m       setCompressed(compressedFile);
+▲  [90m73 |[0m       setCompressing([36mfalse[0m);
+▲  Next.js build worker exited with code: 1 and signal: null
+▲  Error: Command "npm run build" exited with 1
+
+⚡️ The Vercel build (`npx vercel build`) command failed. For more details see the Vercel logs above.
+⚡️ If you need help solving the issue, refer to the Vercel or Next.js documentation or their repositories.
+
