@@ -58,117 +58,140 @@ export default async function ProjectPage({ params }: { params: Promise<{ catego
     [project.id]
   );
 
-  const categoryProjects = await query<Project>(
-    `SELECT id, title, slug FROM projects WHERE category = ? AND status = 'published' ORDER BY created_at DESC`,
-    [category]
+  const relatedProjects = await query<Project>(
+    `SELECT id, title, slug, category FROM projects WHERE category = ? AND status = 'published' AND slug != ? ORDER BY created_at DESC LIMIT 4`,
+    [category, slug]
   );
-
-  const currentIndex = categoryProjects.findIndex((p) => p.slug === slug);
-  const prevProject = categoryProjects[currentIndex - 1];
-  const nextProject = categoryProjects[currentIndex + 1];
 
   const featuredImage = images.find((img) => img.is_featured)?.image_url || images[0]?.image_url;
 
   return (
     <>
       <Navbar />
-      <main className="pt-20 min-h-screen">
-        {/* Hero image */}
-        <div className="relative w-full h-[60vh] md:h-[75vh]">
+      <main className="min-h-screen">
+        {/* Hero image — full width, no text overlay */}
+        <div className="w-full h-[60vh] md:h-[75vh]">
           {featuredImage ? (
             <img src={featuredImage} alt={project.title} className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full bg-[var(--border)]" />
           )}
-          <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12 bg-gradient-to-t from-black/70 to-transparent">
-            <p className="text-[10px] uppercase tracking-[0.3em] text-white/60 mb-2">
-              <Link href={`/projects/${category}`} className="hover:text-white transition-colors">
-                {categories.find((c) => c.slug === category)?.name}
-              </Link>
-            </p>
-            <h1 className="text-3xl md:text-5xl font-light uppercase tracking-[0.1em] text-white">
-              {project.title}
-            </h1>
+        </div>
+
+        {/* Project title */}
+        <div className="max-w-6xl mx-auto px-8 pt-12 pb-8">
+          <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--text-muted)] mb-3">
+            <Link href={`/projects/${category}`} className="hover:text-[var(--text)] transition-colors">
+              {categories.find((c) => c.slug === category)?.name}
+            </Link>
+          </p>
+          <h1 className="text-3xl md:text-5xl font-light" style={{ fontFamily: "var(--font-display), serif" }}>
+            {project.title}
+          </h1>
+        </div>
+
+        {/* Sidebar metadata + Description (ZHA layout) */}
+        <div className="max-w-6xl mx-auto px-8 pb-16">
+          <div className="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-12 border-t border-[var(--border)] pt-10">
+            {/* Left sidebar — metadata */}
+            <div className="space-y-6">
+              {project.location && (
+                <div>
+                  <p className="text-[9px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-1">Location</p>
+                  <p className="text-sm">{project.location}</p>
+                </div>
+              )}
+              {project.year && (
+                <div>
+                  <p className="text-[9px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-1">Year</p>
+                  <p className="text-sm">{project.year}</p>
+                </div>
+              )}
+              <div>
+                <p className="text-[9px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-1">Category</p>
+                <p className="text-sm capitalize">{project.category}</p>
+              </div>
+              <div>
+                <p className="text-[9px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-1">Status</p>
+                <p className="text-sm">Completed</p>
+              </div>
+              <div>
+                <p className="text-[9px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-1">Design</p>
+                <p className="text-sm">Katyal Architects</p>
+              </div>
+            </div>
+
+            {/* Right — description */}
+            <div>
+              {project.description && (
+                <p className="text-base md:text-lg font-light leading-relaxed text-[var(--text-muted)]">
+                  {project.description}
+                </p>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Project info */}
-        <div className="max-w-4xl mx-auto px-8 py-16">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12 border-b border-[var(--border)] pb-12">
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-1">Location</p>
-              <p className="text-sm">{project.location}</p>
-            </div>
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-1">Year</p>
-              <p className="text-sm">{project.year}</p>
-            </div>
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-1">Category</p>
-              <p className="text-sm capitalize">{project.category}</p>
-            </div>
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-1">Status</p>
-              <p className="text-sm">Completed</p>
+        {/* Video */}
+        {project.video_url && (
+          <div className="max-w-6xl mx-auto px-8 pb-12">
+            <div className="aspect-video w-full max-w-4xl mx-auto rounded-md overflow-hidden">
+              {project.video_url.endsWith(".mp4") || project.video_url.endsWith(".webm") ? (
+                <video src={project.video_url} className="w-full h-full object-cover" controls />
+              ) : (
+                <iframe
+                  src={project.video_url.replace("watch?v=", "embed/")}
+                  className="w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              )}
             </div>
           </div>
+        )}
 
-          {/* Description */}
-          {project.description && (
-            <p className="text-lg md:text-xl font-light leading-relaxed max-w-2xl">
-              {project.description}
-            </p>
-          )}
+        {/* Image gallery — full width stacked (ZHA style) */}
+        {images.length > 0 && (
+          <div className="space-y-2 md:space-y-4">
+            {images.map((img, i) => (
+              <div key={i} className="w-full">
+                <img
+                  src={img.image_url}
+                  alt={`${project.title} ${i + 1}`}
+                  className="w-full h-auto object-cover"
+                />
+              </div>
+            ))}
+          </div>
+        )}
 
-          {/* Video */}
-          {project.video_url && (
-            <div className="mt-12 aspect-video rounded-md overflow-hidden">
-              <video src={project.video_url} className="w-full h-full object-cover" controls />
-            </div>
-          )}
-
-          {/* Image gallery */}
-          {images.length > 0 && (
-            <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-4">
-              {images.map((img, i) => (
-                <img key={i} src={img.image_url} alt={`${project.title} ${i + 1}`} className="w-full aspect-[4/3] object-cover rounded-md" />
+        {/* Related projects */}
+        {relatedProjects.length > 0 && (
+          <div className="max-w-6xl mx-auto px-8 py-20">
+            <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--text-muted)] mb-8">Related Projects</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {relatedProjects.map((rp) => (
+                <Link
+                  key={rp.slug}
+                  href={`/projects/${rp.category}/${rp.slug}`}
+                  className="group relative aspect-[4/3] rounded-md overflow-hidden"
+                >
+                  <div className="absolute inset-0 bg-[var(--border)] group-hover:scale-105 transition-transform duration-500" />
+                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-300" />
+                  <p className="absolute bottom-3 left-3 text-[10px] uppercase tracking-[0.15em] text-white font-light z-10">
+                    {rp.title}
+                  </p>
+                </Link>
               ))}
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
-        {/* Prev / Next navigation */}
-        <div className="border-t border-[var(--border)] grid grid-cols-2">
-          {prevProject ? (
-            <Link
-              href={`/projects/${category}/${prevProject.slug}`}
-              className="p-8 md:p-12 hover:bg-[var(--border)]/30 transition-colors group"
-            >
-              <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-2">← Previous</p>
-              <p className="text-sm md:text-base uppercase tracking-[0.1em] group-hover:opacity-70 transition-opacity">{prevProject.title}</p>
-            </Link>
-          ) : (
-            <div className="p-8 md:p-12">
-              <Link href={`/projects/${category}`} className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
-                ← All {categories.find((c) => c.slug === category)?.name}
-              </Link>
-            </div>
-          )}
-          {nextProject ? (
-            <Link
-              href={`/projects/${category}/${nextProject.slug}`}
-              className="p-8 md:p-12 text-right hover:bg-[var(--border)]/30 transition-colors border-l border-[var(--border)] group"
-            >
-              <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-2">Next →</p>
-              <p className="text-sm md:text-base uppercase tracking-[0.1em] group-hover:opacity-70 transition-opacity">{nextProject.title}</p>
-            </Link>
-          ) : (
-            <div className="p-8 md:p-12 text-right border-l border-[var(--border)]">
-              <Link href={`/projects/${category}`} className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
-                All {categories.find((c) => c.slug === category)?.name} →
-              </Link>
-            </div>
-          )}
+        {/* Back to category */}
+        <div className="border-t border-[var(--border)] py-10 text-center">
+          <Link href={`/projects/${category}`} className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
+            ← All {categories.find((c) => c.slug === category)?.name} Projects
+          </Link>
         </div>
       </main>
     </>
