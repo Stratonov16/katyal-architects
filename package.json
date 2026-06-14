@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "cloud-build": "npx --yes @cloudflare/next-on-pages",
+    "cloud-run": "npx wrangler pages dev .vercel/output/static",
+    "cloud": "npm run cloud-build && npm run cloud-run"
   },
   "dependencies": {
     "@cloudflare/next-on-pages": "^1.13.16",

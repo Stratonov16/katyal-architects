@@ -18,15 +18,77 @@ export default function HeroManager({ userRole }: { userRole: string }) {
   const [slides, setSlides] = useState<HeroSlide[]>([]);
   const [croppingSlide, setCroppingSlide] = useState<string | null>(null);
   const [showVideoUploader, setShowVideoUploader] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [message, setMessage] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Load existing slides from D1
+  useEffect(() => {
+    async function fetchSlides() {
+      try {
+        const res = await fetch("/api/admin/hero");
+        if (res.ok) {
+          const data = await res.json();
+          const existingSlides = data.slides.map((s: { image_url: string; project_title: string; project_link: string }, i: number) => ({
+            id: String(i),
+            imageUrl: s.image_url,
+            projectTitle: s.project_title || "",
+            projectLink: s.project_link || "",
+            cropData: null,
+          }));
+          setSlides(existingSlides);
+        }
+      } catch {
+        // No existing slides or not connected to DB yet
+      }
+      setLoading(false);
+    }
+    fetchSlides();
+  }, []);
+
+  // Upload image to R2
+  const uploadImage = async (file: File): Promise<string | null> => {
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("folder", "hero");
+
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        setMessage(data.error || "Upload failed");
+        setUploading(false);
+        return null;
+      }
+
+      const data = await res.json();
+      setUploading(false);
+      return data.url;
+    } catch {
+      setMessage("Upload failed");
+      setUploading(false);
+      return null;
+    }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
 
-    Array.from(files).forEach((file) => {
-      if (!file.type.startsWith("image/")) return;
-      const url = URL.createObjectURL(file);
+    for (const file of Array.from(files)) {
+      if (!file.type.startsWith("image/")) continue;
+
+      // Upload to R2 first
+      const url = await uploadImage(file);
+      if (!url) continue;
+
       const newSlide: HeroSlide = {
         id: Date.now().toString() + Math.random(),
         imageUrl: url,
@@ -36,17 +98,21 @@ export default function HeroManager({ userRole }: { userRole: string }) {
       };
       setSlides((prev) => [...prev, newSlide]);
       setCroppingSlide(newSlide.id);
-    });
+    }
 
     e.target.value = "";
   };
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
     const files = e.dataTransfer.files;
-    Array.from(files).forEach((file) => {
-      if (!file.type.startsWith("image/")) return;
-      const url = URL.createObjectURL(file);
+
+    for (const file of Array.from(files)) {
+      if (!file.type.startsWith("image/")) continue;
+
+      const url = await uploadImage(file);
+      if (!url) continue;
+
       const newSlide: HeroSlide = {
         id: Date.now().toString() + Math.random(),
         imageUrl: url,
@@ -56,7 +122,7 @@ export default function HeroManager({ userRole }: { userRole: string }) {
       };
       setSlides((prev) => [...prev, newSlide]);
       setCroppingSlide(newSlide.id);
-    });
+    }
   };
 
   const handleCropApply = (id: string, cropData: CropData) => {
@@ -92,12 +158,45 @@ export default function HeroManager({ userRole }: { userRole: string }) {
     setSlides(newSlides);
   };
 
-  const handlePublish = () => {
-    // TODO: Upload to R2 + save to D1
-    alert(userRole === "super_admin" ? "Published!" : "Saved as draft for approval.");
+  // Publish — save to D1
+  const handlePublish = async () => {
+    setSaving(true);
+    setMessage("");
+
+    try {
+      const res = await fetch("/api/admin/hero", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          slides: slides.map((s) => ({
+            imageUrl: s.imageUrl,
+            projectTitle: s.projectTitle,
+            projectLink: s.projectLink,
+          })),
+        }),
+      });
+
+      const data = await res.json();
+      setMessage(data.message || "Saved!");
+    } catch {
+      setMessage("Failed to save. Try again.");
+    }
+
+    setSaving(false);
   };
 
   const croppingSlideData = slides.find((s) => s.id === croppingSlide);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[var(--bg)]">
+        <AdminHeader />
+        <div className="flex items-center justify-center pt-32">
+          <p className="text-sm text-[var(--text-muted)]">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[var(--bg)]">
@@ -113,14 +212,22 @@ export default function HeroManager({ userRole }: { userRole: string }) {
               Hero Carousel
             </h1>
           </div>
-          <button
-            onClick={handlePublish}
-            disabled={slides.length === 0}
-            className="text-xs uppercase tracking-[0.2em] border border-[var(--text)] px-6 py-3 rounded-md hover:bg-[var(--text)] hover:text-[var(--bg)] transition-all duration-300 disabled:opacity-30"
-          >
-            {userRole === "super_admin" ? "Publish" : "Submit for Approval"}
-          </button>
+          <div className="flex items-center gap-4">
+            {message && <p className="text-xs text-[var(--text-muted)]">{message}</p>}
+            <button
+              onClick={handlePublish}
+              disabled={slides.length === 0 || saving}
+              className="text-xs uppercase tracking-[0.2em] border border-[var(--text)] px-6 py-3 rounded-md hover:bg-[var(--text)] hover:text-[var(--bg)] transition-all duration-300 disabled:opacity-30"
+            >
+              {saving ? "Saving..." : userRole === "super_admin" ? "Publish" : "Submit for Approval"}
+            </button>
+          </div>
         </div>
+
+        {/* Uploading indicator */}
+        {uploading && (
+          <div className="mb-4 text-xs text-[var(--text-muted)] animate-pulse">Uploading image...</div>
+        )}
 
         {/* Live preview */}
         <div className="mb-8">
@@ -276,15 +383,24 @@ export default function HeroManager({ userRole }: { userRole: string }) {
       {/* Video uploader modal */}
       {showVideoUploader && (
         <VideoUploader
-          onSelect={(video) => {
-            const newSlide: HeroSlide = {
-              id: Date.now().toString() + Math.random(),
-              imageUrl: video.type === "upload" ? video.localUrl || "" : `https://img.youtube.com/vi/${video.youtubeId}/maxresdefault.jpg`,
-              projectTitle: "",
-              projectLink: "",
-              cropData: null,
-            };
-            setSlides((prev) => [...prev, newSlide]);
+          onSelect={async (video) => {
+            let url = "";
+            if (video.type === "upload" && video.file) {
+              const uploaded = await uploadImage(video.file);
+              url = uploaded || "";
+            } else if (video.type === "youtube" && video.youtubeId) {
+              url = `https://img.youtube.com/vi/${video.youtubeId}/maxresdefault.jpg`;
+            }
+            if (url) {
+              const newSlide: HeroSlide = {
+                id: Date.now().toString() + Math.random(),
+                imageUrl: url,
+                projectTitle: "",
+                projectLink: "",
+                cropData: null,
+              };
+              setSlides((prev) => [...prev, newSlide]);
+            }
             setShowVideoUploader(false);
           }}
           onCancel={() => setShowVideoUploader(false)}
