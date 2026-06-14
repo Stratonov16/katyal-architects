@@ -42,7 +42,7 @@ export default function Navbar() {
         </a>
 
         {/* Nav links — center (desktop only) */}
-        <div className="hidden md:flex items-center gap-8 text-xs uppercase tracking-[0.15em] font-semibold" style={{ fontFamily: "var(--font-body), sans-serif" }}>
+        <div className="hidden md:flex items-center gap-8 text-xs uppercase tracking-[0.15em] font-normal" style={{ fontFamily: "var(--font-body), sans-serif" }}>
           <a href="/" className="hover:opacity-60 transition-opacity">HOME</a>
           <a href="#about" className="hover:opacity-60 transition-opacity">ABOUT</a>
           <div className="relative">
@@ -67,7 +67,7 @@ export default function Navbar() {
           <div className="relative">
             <button
               onClick={() => { setConnectOpen(!connectOpen); setServicesOpen(false); }}
-              className="hover:opacity-60 transition-opacity"
+              className="hover:opacity-80 transition-opacity text-[#c9a84c]"
             >
               CONTACT US
             </button>
