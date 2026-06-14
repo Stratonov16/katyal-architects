@@ -7,7 +7,7 @@ import { useEffect, useRef, useCallback, useState } from "react";
 export default function Home() {
   const sectionsRef = useRef<HTMLDivElement>(null);
   const reviewIndex = useRef(0);
-  const [scrollProgress, setScrollProgress] = useState(0);
+  const [sectionProgress, setSectionProgress] = useState(0);
   const [heroSlides, setHeroSlides] = useState<{image_url: string; project_title: string; project_link: string}[]>([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [about, setAbout] = useState<{headline: string; description: string; photo_url: string} | null>(null);
@@ -68,12 +68,17 @@ export default function Home() {
     const growElements = sectionsRef.current?.querySelectorAll(".reveal-grow");
     growElements?.forEach((el) => observer.observe(el));
 
-    // Scroll progress
+    // Section-based progress
+    const sections = ["about", "projects", "instagram", "reviews", "team", "contact"];
     const handleScroll = () => {
-      const scrollTop = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
-      setScrollProgress(progress);
+      let reached = 0;
+      for (let i = 0; i < sections.length; i++) {
+        const el = document.getElementById(sections[i]);
+        if (el && el.getBoundingClientRect().top < window.innerHeight * 0.5) {
+          reached = i + 1;
+        }
+      }
+      setSectionProgress((reached / sections.length) * 100);
     };
     window.addEventListener("scroll", handleScroll);
     handleScroll();
@@ -102,8 +107,10 @@ export default function Home() {
     <>
       <Navbar />
 
-      {/* Scroll progress bar */}
-      <div className="scroll-progress" style={{ width: `${scrollProgress}%` }} />
+      {/* Section progress bar */}
+      <div className="section-progress">
+        <div className="section-progress-fill" style={{ width: `${sectionProgress}%` }} />
+      </div>
 
       <main className="" ref={sectionsRef}>
         {/* 1. Hero — Auto-rotating Project Carousel */}

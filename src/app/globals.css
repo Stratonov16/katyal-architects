@@ -62,15 +62,26 @@ html {
   animation: slide-up 0.3s ease-out;
 }
 
-/* Scroll progress bar at top */
-.scroll-progress {
+/* Section progress bar under navbar */
+.section-progress {
   position: fixed;
-  top: 0;
-  left: 0;
-  height: 3px;
-  background: #22c55e;
+  top: 56px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(600px, 80vw);
+  height: 2px;
+  background: var(--border);
   z-index: 9999;
-  transition: width 0.1s ease-out;
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.section-progress-fill {
+  height: 100%;
+  background: var(--text);
+  opacity: 0.5;
+  transition: width 0.4s ease-out;
+  border-radius: 1px;
 }
 
 /* Section reveal with grow effect */
