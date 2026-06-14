@@ -25,7 +25,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${cormorant.variable} ${outfit.variable}`}>
+    <html lang="en" className={`${cormorant.variable} ${outfit.variable}`} suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var t=localStorage.getItem("theme");document.documentElement.setAttribute("data-theme",t==="light"?"light":"dark")})()`,
+          }}
+        />
+      </head>
       <body>{children}</body>
     </html>
   );
