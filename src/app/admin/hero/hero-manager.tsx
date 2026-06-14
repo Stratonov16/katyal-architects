@@ -29,8 +29,9 @@ export default function HeroManager({ userRole }: { userRole: string }) {
     async function fetchSlides() {
       try {
         const res = await fetch("/api/admin/hero");
-        if (res.ok) {
-          const data = await res.json();
+        const data = await res.json();
+        alert(`Loaded slides: ${res.status} - ${JSON.stringify(data).slice(0, 200)}`);
+        if (res.ok && data.slides) {
           const existingSlides = data.slides.map((s: { image_url: string; project_title: string; project_link: string }, i: number) => ({
             id: String(i),
             imageUrl: s.image_url,
@@ -40,8 +41,8 @@ export default function HeroManager({ userRole }: { userRole: string }) {
           }));
           setSlides(existingSlides);
         }
-      } catch {
-        // No existing slides or not connected to DB yet
+      } catch (err) {
+        alert(`Load error: ${err}`);
       }
       setLoading(false);
     }
@@ -51,6 +52,7 @@ export default function HeroManager({ userRole }: { userRole: string }) {
   // Upload image to R2
   const uploadImage = async (file: File): Promise<string | null> => {
     setUploading(true);
+    alert(`Uploading: ${file.name} (${(file.size / 1024 / 1024).toFixed(1)}MB)`);
     try {
       const formData = new FormData();
       formData.append("file", file);
@@ -61,17 +63,19 @@ export default function HeroManager({ userRole }: { userRole: string }) {
         body: formData,
       });
 
+      const data = await res.json();
+      alert(`Upload response: ${res.status} - ${JSON.stringify(data)}`);
+
       if (!res.ok) {
-        const data = await res.json();
         setMessage(data.error || "Upload failed");
         setUploading(false);
         return null;
       }
 
-      const data = await res.json();
       setUploading(false);
       return data.url;
-    } catch {
+    } catch (err) {
+      alert(`Upload error: ${err}`);
       setMessage("Upload failed");
       setUploading(false);
       return null;
@@ -293,75 +297,71 @@ export default function HeroManager({ userRole }: { userRole: string }) {
               Slides ({slides.length})
             </p>
             {slides.map((slide, index) => (
-              <div key={slide.id} className="border border-[var(--border)] rounded-md p-4">
-                <div className="flex gap-4">
-                  {/* Thumbnail — click to re-crop */}
-                  <div
-                    className="relative w-48 h-28 rounded overflow-hidden cursor-pointer flex-shrink-0 group"
-                    onClick={() => setCroppingSlide(slide.id)}
-                  >
-                    <img
-                      src={slide.imageUrl}
-                      alt={`Slide ${index + 1}`}
-                      className="w-full h-full object-cover"
-                      style={slide.cropData ? {
-                        objectPosition: `${50 + slide.cropData.x / 5}% ${50 + slide.cropData.y / 5}%`,
-                      } : undefined}
-                    />
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
-                      <p className="text-[9px] text-white opacity-0 group-hover:opacity-100 transition-opacity uppercase tracking-[0.1em]">
-                        Edit Crop
-                      </p>
-                    </div>
-                    {slide.cropData && (
-                      <div className="absolute top-1 right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
-                        <span className="text-[8px] text-white">✓</span>
-                      </div>
-                    )}
+              <div key={slide.id} className="border border-[var(--border)] rounded-md p-3 overflow-hidden">
+                {/* Thumbnail — click to re-crop */}
+                <div
+                  className="relative w-full h-32 rounded overflow-hidden cursor-pointer group mb-3"
+                  onClick={() => setCroppingSlide(slide.id)}
+                >
+                  <img
+                    src={slide.imageUrl}
+                    alt={`Slide ${index + 1}`}
+                    className="w-full h-full object-cover"
+                    style={slide.cropData ? {
+                      objectPosition: `${50 + slide.cropData.x / 5}% ${50 + slide.cropData.y / 5}%`,
+                    } : undefined}
+                  />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+                    <p className="text-[9px] text-white opacity-0 group-hover:opacity-100 transition-opacity uppercase tracking-[0.1em]">
+                      Edit Crop
+                    </p>
                   </div>
+                  {slide.cropData && (
+                    <div className="absolute top-1 right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                      <span className="text-[8px] text-white">✓</span>
+                    </div>
+                  )}
+                </div>
 
-                  {/* Controls */}
-                  <div className="flex-1 space-y-3">
-                    <select
-                      value={slide.projectLink}
-                      onChange={(e) => {
-                        const selected = projects.find((p) => `/projects/${p.category}/${p.slug}` === e.target.value);
-                        handleLinkChange(slide.id, e.target.value);
-                        if (selected) handleTitleChange(slide.id, selected.title);
-                      }}
-                      className="w-full bg-transparent border-b border-[var(--border)] py-2 text-sm outline-none focus:border-[var(--text)] transition-colors"
-                    >
-                      <option value="">Link to project</option>
-                      {projects.map((p) => (
-                        <option key={p.slug} value={`/projects/${p.category}/${p.slug}`}>
-                          {p.title} ({p.category})
-                        </option>
-                      ))}
-                    </select>
-                    <div className="flex items-center gap-2 pt-2">
-                      <button
-                        onClick={() => moveSlide(slide.id, -1)}
-                        disabled={index === 0}
-                        className="text-[10px] px-2 py-1 border border-[var(--border)] rounded hover:bg-[var(--text)]/5 disabled:opacity-30 transition-colors"
-                      >
-                        ↑
-                      </button>
-                      <button
-                        onClick={() => moveSlide(slide.id, 1)}
-                        disabled={index === slides.length - 1}
-                        className="text-[10px] px-2 py-1 border border-[var(--border)] rounded hover:bg-[var(--text)]/5 disabled:opacity-30 transition-colors"
-                      >
-                        ↓
-                      </button>
-                      <span className="text-[10px] text-[var(--text-muted)] ml-2">Slide {index + 1}</span>
-                      <button
-                        onClick={() => handleDelete(slide.id)}
-                        className="ml-auto text-[10px] px-2 py-1 text-red-500 hover:bg-red-500/10 rounded transition-colors"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
+                {/* Controls */}
+                <select
+                  value={slide.projectLink}
+                  onChange={(e) => {
+                    const selected = projects.find((p) => `/projects/${p.category}/${p.slug}` === e.target.value);
+                    handleLinkChange(slide.id, e.target.value);
+                    if (selected) handleTitleChange(slide.id, selected.title);
+                  }}
+                  className="w-full bg-transparent border-b border-[var(--border)] py-2 text-xs outline-none focus:border-[var(--text)] transition-colors mb-3"
+                >
+                  <option value="">Link to project</option>
+                  {projects.map((p) => (
+                    <option key={p.slug} value={`/projects/${p.category}/${p.slug}`}>
+                      {p.title} ({p.category})
+                    </option>
+                  ))}
+                </select>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => moveSlide(slide.id, -1)}
+                    disabled={index === 0}
+                    className="text-[10px] px-2 py-1 border border-[var(--border)] rounded hover:bg-[var(--text)]/5 disabled:opacity-30 transition-colors"
+                  >
+                    ↑
+                  </button>
+                  <button
+                    onClick={() => moveSlide(slide.id, 1)}
+                    disabled={index === slides.length - 1}
+                    className="text-[10px] px-2 py-1 border border-[var(--border)] rounded hover:bg-[var(--text)]/5 disabled:opacity-30 transition-colors"
+                  >
+                    ↓
+                  </button>
+                  <span className="text-[10px] text-[var(--text-muted)]">Slide {index + 1}</span>
+                  <button
+                    onClick={() => handleDelete(slide.id)}
+                    className="ml-auto text-[10px] px-2 py-1 text-red-500 hover:bg-red-500/10 rounded transition-colors"
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
             ))}

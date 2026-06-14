@@ -5,13 +5,21 @@ export function getR2() {
   return env.BUCKET;
 }
 
+function getPublicUrl(): string {
+  try {
+    const { env } = getRequestContext();
+    return (env as unknown as Record<string, string>).R2_PUBLIC_URL || process.env.R2_PUBLIC_URL || "";
+  } catch {
+    return process.env.R2_PUBLIC_URL || "";
+  }
+}
+
 export async function uploadToR2(file: Buffer | ArrayBuffer, key: string, contentType: string): Promise<string> {
   const r2 = getR2();
   await r2.put(key, file, {
     httpMetadata: { contentType },
   });
-  // Return the public URL (configured via custom domain or R2 public access)
-  return `${process.env.R2_PUBLIC_URL || ""}/${key}`;
+  return `${getPublicUrl()}/${key}`;
 }
 
 export async function deleteFromR2(key: string): Promise<void> {

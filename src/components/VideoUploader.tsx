@@ -42,40 +42,26 @@ export default function VideoUploader({ onSelect, onCancel }: VideoUploaderProps
   const [compressed, setCompressed] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleCompress = async () => {
-    if (!preview?.file) return;
-    setCompressing(true);
-    setCompressProgress(0);
-
-    try {
-      const { FFmpeg } = await import("@ffmpeg/ffmpeg");
-      const { fetchFile } = await import("@ffmpeg/util");
-
-      const ffmpeg = new FFmpeg();
-      ffmpeg.on("progress", ({ progress }) => {
-        setCompressProgress(Math.round(progress * 100));
-      });
-
-      await ffmpeg.load();
-
-      const inputName = "input.mp4";
-      const outputName = "output.mp4";
-
-      await ffmpeg.writeFile(inputName, await fetchFile(preview.file));
-
-      const crf = Math.round(51 - (quality / 100) * 30);
-      await ffmpeg.exec(["-i", inputName, "-crf", String(crf), "-preset", "fast", outputName]);
-
-      const data = await ffmpeg.readFile(outputName);
-      const compressedFile = new File([data as unknown as BlobPart], preview.file.name, { type: "video/mp4" });
-
-      setCompressed(compressedFile);
-      setCompressing(false);
-    } catch (err) {
-      setError("Compression failed. Try uploading original instead.");
-      setCompressing(false);
-    }
-  };
+  // TODO: Re-enable when on paid plan (ffmpeg.wasm exceeds 3MB free tier limit)
+  // const handleCompress = async () => {
+  //   if (!preview?.file) return;
+  //   setCompressing(true);
+  //   setCompressProgress(0);
+  //   try {
+  //     const { FFmpeg } = await import("@ffmpeg/ffmpeg");
+  //     const { fetchFile } = await import("@ffmpeg/util");
+  //     const ffmpeg = new FFmpeg();
+  //     ffmpeg.on("progress", ({ progress }) => setCompressProgress(Math.round(progress * 100)));
+  //     await ffmpeg.load();
+  //     await ffmpeg.writeFile("input.mp4", await fetchFile(preview.file));
+  //     const crf = Math.round(51 - (quality / 100) * 30);
+  //     await ffmpeg.exec(["-i", "input.mp4", "-crf", String(crf), "-preset", "fast", "output.mp4"]);
+  //     const data = await ffmpeg.readFile("output.mp4");
+  //     setCompressed(new File([data as unknown as BlobPart], preview.file.name, { type: "video/mp4" }));
+  //     setCompressing(false);
+  //   } catch { setError("Compression failed."); setCompressing(false); }
+  // };
+  const handleCompress = () => {};
 
   const resetCompression = () => {
     setQuality(100);
@@ -235,8 +221,8 @@ export default function VideoUploader({ onSelect, onCancel }: VideoUploaderProps
                   {preview.file.name} — {(preview.file.size / (1024 * 1024)).toFixed(1)}MB
                 </p>
 
-                {/* Compression option */}
-                <div className="border border-[var(--border)] rounded-md p-4 space-y-3">
+                {/* TODO: Re-enable compression UI when on paid plan */}
+                {/* <div className="border border-[var(--border)] rounded-md p-4 space-y-3">
                   <div className="flex items-center justify-between">
                     <p className="text-[10px] uppercase tracking-[0.15em]">Compress (optional)</p>
                     <p className="text-[9px] text-[var(--text-muted)]">
@@ -245,41 +231,29 @@ export default function VideoUploader({ onSelect, onCancel }: VideoUploaderProps
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="text-[9px] text-[var(--text-muted)]">Smaller</span>
-                    <input
-                      type="range"
-                      min={20}
-                      max={100}
-                      value={quality}
+                    <input type="range" min={20} max={100} value={quality}
                       onChange={(e) => setQuality(Number(e.target.value))}
-                      className="flex-1 h-1 bg-[var(--border)] rounded-full appearance-none cursor-pointer"
-                    />
+                      className="flex-1 h-1 bg-[var(--border)] rounded-full appearance-none cursor-pointer" />
                     <span className="text-[9px] text-[var(--text-muted)]">Original</span>
                   </div>
                   <p className="text-[9px] text-[var(--text-muted)] text-center">
-                    {quality === 100 ? "No compression — original quality" : `Quality: ${quality}%`}
+                    {quality === 100 ? "No compression" : `Quality: ${quality}%`}
                   </p>
                   {quality < 100 && !compressing && !compressed && (
-                    <button
-                      onClick={handleCompress}
-                      className="w-full text-[10px] uppercase tracking-[0.15em] py-2 border border-[var(--border)] rounded hover:bg-[var(--text)]/5 transition-colors"
-                    >
-                      Compress Video
-                    </button>
+                    <button onClick={handleCompress} className="w-full text-[10px] uppercase tracking-[0.15em] py-2 border border-[var(--border)] rounded">Compress Video</button>
                   )}
                   {compressing && (
                     <div className="space-y-2">
                       <div className="w-full h-1 bg-[var(--border)] rounded-full overflow-hidden">
-                        <div className="h-full bg-[var(--text)] transition-all duration-300" style={{ width: `${compressProgress}%` }} />
+                        <div className="h-full bg-[var(--text)]" style={{ width: `${compressProgress}%` }} />
                       </div>
                       <p className="text-[9px] text-[var(--text-muted)] text-center">Compressing... {compressProgress}%</p>
                     </div>
                   )}
                   {compressed && (
-                    <p className="text-[9px] text-green-500 text-center">
-                      Compressed: {(compressed.size / (1024 * 1024)).toFixed(1)}MB (saved {Math.round((1 - compressed.size / preview.file!.size) * 100)}%)
-                    </p>
+                    <p className="text-[9px] text-green-500 text-center">Compressed!</p>
                   )}
-                </div>
+                </div> */}
               </div>
             )}
 
