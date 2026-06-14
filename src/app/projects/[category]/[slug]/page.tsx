@@ -3,6 +3,7 @@ export const runtime = "edge";
 import Link from "next/link";
 import { query, queryOne } from "@/lib/db";
 import Navbar from "@/components/Navbar";
+import GallerySection from "@/components/GallerySection";
 
 const categories = [
   { name: "Residential", slug: "residential" },
@@ -78,8 +79,8 @@ export default async function ProjectPage({ params }: { params: Promise<{ catego
           )}
         </div>
 
-        {/* Project title */}
-        <div className="max-w-6xl mx-auto px-8 pt-12 pb-8">
+        {/* Project title — fades in */}
+        <div className="max-w-6xl mx-auto px-8 pt-12 pb-8 animate-[fadeUp_0.8s_ease_0.2s_both]">
           <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--text-muted)] mb-3">
             <Link href={`/projects/${category}`} className="hover:text-[var(--text)] transition-colors">
               {categories.find((c) => c.slug === category)?.name}
@@ -91,7 +92,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ catego
         </div>
 
         {/* Sidebar metadata + Description (ZHA layout) */}
-        <div className="max-w-6xl mx-auto px-8 pb-16">
+        <div className="max-w-6xl mx-auto px-8 pb-16 animate-[fadeUp_0.8s_ease_0.5s_both]">
           <div className="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-12 border-t border-[var(--border)] pt-10">
             {/* Left sidebar — metadata */}
             <div className="space-y-6">
@@ -150,20 +151,13 @@ export default async function ProjectPage({ params }: { params: Promise<{ catego
           </div>
         )}
 
-        {/* Image gallery — full width stacked (ZHA style) */}
+        {/* Image gallery — full width stacked with scroll reveal */}
         {images.length > 0 && (
-          <div className="space-y-2 md:space-y-4">
-            {images.map((img, i) => (
-              <div key={i} className="w-full">
-                <img
-                  src={img.image_url}
-                  alt={`${project.title} ${i + 1}`}
-                  className="w-full h-auto object-cover"
-                />
-              </div>
-            ))}
-          </div>
+          <GallerySection images={images} title={project.title} />
         )}
+
+        {/* Spacer before related */}
+        <div className="py-8" />
 
         {/* Related projects */}
         {relatedProjects.length > 0 && (
