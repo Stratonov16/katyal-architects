@@ -239,7 +239,6 @@ export default function CareersManager({ userRole }: { userRole: string }) {
             ))
           )}
         </div>
-      </div>
 
         {/* Applications */}
         {applications.length > 0 && (
