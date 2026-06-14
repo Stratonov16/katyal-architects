@@ -69,16 +69,16 @@ export default function Home() {
     growElements?.forEach((el) => observer.observe(el));
 
     // Section-based progress
-    const sectionIds = ["about", "projects", "instagram", "reviews", "team", "contact"];
+    const sections = ["about", "projects", "instagram", "reviews", "team", "contact"];
     const handleScroll = () => {
       let reached = 0;
-      for (let i = 0; i < sectionIds.length; i++) {
-        const el = document.getElementById(sectionIds[i]);
+      for (let i = 0; i < sections.length; i++) {
+        const el = document.getElementById(sections[i]);
         if (el && el.getBoundingClientRect().top < window.innerHeight * 0.5) {
           reached = i + 1;
         }
       }
-      setSectionProgress((reached / sectionIds.length) * 100);
+      setSectionProgress((reached / sections.length) * 100);
     };
     window.addEventListener("scroll", handleScroll);
     handleScroll();
