@@ -35,18 +35,16 @@ export default function Home() {
     const slider = document.querySelector(".review-slider") as HTMLElement;
     if (!slider) return;
     const isMobile = window.innerWidth < 768;
-    const step = isMobile ? 1 : 3;
-    const total = 5;
-    const maxIndex = isMobile ? total - 1 : Math.ceil(total / 3) - 1;
+    const cards = slider.children.length;
+    if (cards === 0) return;
+    const maxIndex = isMobile ? cards - 1 : Math.max(0, cards - 3);
 
     reviewIndex.current += direction;
     if (reviewIndex.current > maxIndex) reviewIndex.current = 0;
     if (reviewIndex.current < 0) reviewIndex.current = maxIndex;
 
-    const offset = isMobile
-      ? reviewIndex.current * -100
-      : reviewIndex.current * -100;
-    slider.style.transform = `translateX(${offset}%)`;
+    const cardWidth = isMobile ? 100 : 100 / 3;
+    slider.style.transform = `translateX(-${reviewIndex.current * cardWidth}%)`;
   }, []);
 
   useEffect(() => {
