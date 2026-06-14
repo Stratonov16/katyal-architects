@@ -49,12 +49,12 @@ export default async function CareersPage() {
                         <span className="text-[9px] uppercase tracking-[0.1em] px-2 py-1 border border-[var(--border)] rounded">{job.type}</span>
                       </div>
                     </div>
-                    <a
-                      href={`mailto:ar.shubhamkatyal@gmail.com?subject=Application: ${job.title}`}
+                    <Link
+                      href={`/careers/apply?id=${job.id}&title=${encodeURIComponent(job.title)}`}
                       className="text-[10px] uppercase tracking-[0.2em] border border-[var(--text)] px-5 py-2.5 rounded-md hover:bg-[var(--text)] hover:text-[var(--bg)] transition-all duration-300 text-center"
                     >
                       Apply
-                    </a>
+                    </Link>
                   </div>
                   {job.description && (
                     <p className="text-sm text-[var(--text-muted)] mt-4 leading-relaxed">{job.description}</p>

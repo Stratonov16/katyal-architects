@@ -15,8 +15,21 @@ type Job = {
   status: string;
 };
 
+type Application = {
+  id: number;
+  job_title: string;
+  name: string;
+  email: string;
+  phone: string;
+  resume_url: string;
+  cover_letter: string;
+  is_read: number;
+  created_at: string;
+};
+
 export default function CareersManager({ userRole }: { userRole: string }) {
   const [jobs, setJobs] = useState<Job[]>([]);
+  const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<Job | null>(null);
@@ -33,7 +46,10 @@ export default function CareersManager({ userRole }: { userRole: string }) {
   useEffect(() => {
     fetch("/api/admin/careers")
       .then((r) => r.json())
-      .then((d) => { if (d.jobs) setJobs(d.jobs); })
+      .then((d) => {
+        if (d.jobs) setJobs(d.jobs);
+        if (d.applications) setApplications(d.applications);
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
@@ -223,6 +239,38 @@ export default function CareersManager({ userRole }: { userRole: string }) {
             ))
           )}
         </div>
+      </div>
+
+        {/* Applications */}
+        {applications.length > 0 && (
+          <div className="mt-12">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-4">
+              Applications ({applications.filter((a) => !a.is_read).length} new)
+            </p>
+            <div className="space-y-3">
+              {applications.map((app) => (
+                <div key={app.id} className={`border rounded-md p-4 ${app.is_read ? "border-[var(--border)] opacity-60" : "border-[var(--review-border)]"}`}>
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="text-sm">{app.name}</p>
+                      <p className="text-[10px] text-[var(--text-muted)] mt-1">{app.email} · {app.phone}</p>
+                      <p className="text-[10px] text-[var(--text-muted)]">Applied for: {app.job_title}</p>
+                      {app.cover_letter && (
+                        <p className="text-xs text-[var(--text-muted)] mt-2 italic">&ldquo;{app.cover_letter.slice(0, 150)}{app.cover_letter.length > 150 ? "..." : ""}&rdquo;</p>
+                      )}
+                      {app.resume_url && (
+                        <a href={app.resume_url} target="_blank" className="text-[9px] uppercase tracking-[0.1em] text-[#c9a84c] mt-2 inline-block hover:opacity-70">
+                          View Resume ↗
+                        </a>
+                      )}
+                      <p className="text-[9px] text-[var(--text-muted)] mt-2">{app.created_at}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}

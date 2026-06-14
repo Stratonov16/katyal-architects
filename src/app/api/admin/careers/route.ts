@@ -9,7 +9,8 @@ export async function GET() {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const jobs = await query(`SELECT * FROM careers ORDER BY created_at DESC`);
-  return NextResponse.json({ jobs });
+  const applications = await query(`SELECT * FROM job_applications ORDER BY created_at DESC`);
+  return NextResponse.json({ jobs, applications });
 }
 
 export async function POST(request: NextRequest) {
