@@ -5,7 +5,6 @@ import ImageCropper, { CropData } from "@/components/ImageCropper";
 import VideoUploader from "@/components/VideoUploader";
 import AdminHeader from "@/components/AdminHeader";
 import Toast from "@/components/Toast";
-import { projects } from "@/lib/projects";
 
 type HeroSlide = {
   id: string;
@@ -22,16 +21,20 @@ export default function HeroManager({ userRole }: { userRole: string }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [projectsList, setProjectsList] = useState<{id: number; title: string; slug: string; category: string}[]>([]);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Load existing slides from D1
+  // Load existing slides + projects list from D1
   useEffect(() => {
-    async function fetchSlides() {
+    async function fetchData() {
       try {
-        const res = await fetch("/api/admin/hero");
-        if (res.ok) {
-          const data = await res.json();
+        const [slidesRes, projectsRes] = await Promise.all([
+          fetch("/api/admin/hero"),
+          fetch("/api/admin/projects"),
+        ]);
+        if (slidesRes.ok) {
+          const data = await slidesRes.json();
           if (data.slides) {
             const existingSlides = data.slides.map((s: { image_url: string; project_title: string; project_link: string }, i: number) => ({
               id: String(i),
@@ -43,12 +46,16 @@ export default function HeroManager({ userRole }: { userRole: string }) {
             setSlides(existingSlides);
           }
         }
+        if (projectsRes.ok) {
+          const data = await projectsRes.json();
+          if (data.projects) setProjectsList(data.projects);
+        }
       } catch {
-        // Silent fail — no slides loaded
+        // Silent fail
       }
       setLoading(false);
     }
-    fetchSlides();
+    fetchData();
   }, []);
 
   // Upload image to R2
@@ -332,14 +339,14 @@ export default function HeroManager({ userRole }: { userRole: string }) {
                 <select
                   value={slide.projectLink}
                   onChange={(e) => {
-                    const selected = projects.find((p) => `/projects/${p.category}/${p.slug}` === e.target.value);
+                    const selected = projectsList.find((p) => `/projects/${p.category}/${p.slug}` === e.target.value);
                     handleLinkChange(slide.id, e.target.value);
                     if (selected) handleTitleChange(slide.id, selected.title);
                   }}
                   className="w-full bg-transparent border-b border-[var(--border)] py-2 text-xs outline-none focus:border-[var(--text)] transition-colors mb-3"
                 >
                   <option value="">Link to project</option>
-                  {projects.map((p) => (
+                  {projectsList.map((p) => (
                     <option key={p.slug} value={`/projects/${p.category}/${p.slug}`}>
                       {p.title} ({p.category})
                     </option>
