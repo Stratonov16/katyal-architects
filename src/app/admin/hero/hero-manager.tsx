@@ -30,20 +30,21 @@ export default function HeroManager({ userRole }: { userRole: string }) {
     async function fetchSlides() {
       try {
         const res = await fetch("/api/admin/hero");
-        const data = await res.json();
-        alert(`Loaded slides: ${res.status} - ${JSON.stringify(data).slice(0, 200)}`);
-        if (res.ok && data.slides) {
-          const existingSlides = data.slides.map((s: { image_url: string; project_title: string; project_link: string }, i: number) => ({
-            id: String(i),
-            imageUrl: s.image_url,
-            projectTitle: s.project_title || "",
-            projectLink: s.project_link || "",
-            cropData: null,
-          }));
-          setSlides(existingSlides);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.slides) {
+            const existingSlides = data.slides.map((s: { image_url: string; project_title: string; project_link: string }, i: number) => ({
+              id: String(i),
+              imageUrl: s.image_url,
+              projectTitle: s.project_title || "",
+              projectLink: s.project_link || "",
+              cropData: null,
+            }));
+            setSlides(existingSlides);
+          }
         }
-      } catch (err) {
-        alert(`Load error: ${err}`);
+      } catch {
+        // Silent fail — no slides loaded
       }
       setLoading(false);
     }
@@ -53,7 +54,6 @@ export default function HeroManager({ userRole }: { userRole: string }) {
   // Upload image to R2
   const uploadImage = async (file: File): Promise<string | null> => {
     setUploading(true);
-    alert(`Uploading: ${file.name} (${(file.size / 1024 / 1024).toFixed(1)}MB)`);
     try {
       const formData = new FormData();
       formData.append("file", file);
@@ -65,7 +65,6 @@ export default function HeroManager({ userRole }: { userRole: string }) {
       });
 
       const data = await res.json();
-      alert(`Upload response: ${res.status} - ${JSON.stringify(data)}`);
 
       if (!res.ok) {
         setToast({ message: data.error || "Upload failed", type: "error" });
@@ -75,8 +74,7 @@ export default function HeroManager({ userRole }: { userRole: string }) {
 
       setUploading(false);
       return data.url;
-    } catch (err) {
-      alert(`Upload error: ${err}`);
+    } catch {
       setToast({ message: "Upload failed", type: "error" });
       setUploading(false);
       return null;
