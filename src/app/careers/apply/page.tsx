@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import AdminHeader from "@/components/AdminHeader";
 
-export default function ApplyPage() {
+function ApplyForm() {
   const searchParams = useSearchParams();
   const jobId = searchParams.get("id") || "";
   const jobTitle = searchParams.get("title") || "Open Position";
@@ -152,5 +152,13 @@ export default function ApplyPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function ApplyPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[var(--bg)]"><AdminHeader /><div className="flex items-center justify-center pt-32"><p className="text-sm text-[var(--text-muted)]">Loading...</p></div></div>}>
+      <ApplyForm />
+    </Suspense>
   );
 }
