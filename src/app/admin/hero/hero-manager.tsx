@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import ImageCropper, { CropData } from "@/components/ImageCropper";
 import VideoUploader from "@/components/VideoUploader";
 import AdminHeader from "@/components/AdminHeader";
+import Toast from "@/components/Toast";
 import { projects } from "@/lib/projects";
 
 type HeroSlide = {
@@ -21,7 +22,7 @@ export default function HeroManager({ userRole }: { userRole: string }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [message, setMessage] = useState("");
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Load existing slides from D1
@@ -67,7 +68,7 @@ export default function HeroManager({ userRole }: { userRole: string }) {
       alert(`Upload response: ${res.status} - ${JSON.stringify(data)}`);
 
       if (!res.ok) {
-        setMessage(data.error || "Upload failed");
+        setToast({ message: data.error || "Upload failed", type: "error" });
         setUploading(false);
         return null;
       }
@@ -76,7 +77,7 @@ export default function HeroManager({ userRole }: { userRole: string }) {
       return data.url;
     } catch (err) {
       alert(`Upload error: ${err}`);
-      setMessage("Upload failed");
+      setToast({ message: "Upload failed", type: "error" });
       setUploading(false);
       return null;
     }
@@ -165,7 +166,6 @@ export default function HeroManager({ userRole }: { userRole: string }) {
   // Publish — save to D1
   const handlePublish = async () => {
     setSaving(true);
-    setMessage("");
 
     try {
       const res = await fetch("/api/admin/hero", {
@@ -181,9 +181,9 @@ export default function HeroManager({ userRole }: { userRole: string }) {
       });
 
       const data = await res.json();
-      setMessage(data.message || "Saved!");
+      setToast({ message: data.message || "Saved!", type: "success" });
     } catch {
-      setMessage("Failed to save. Try again.");
+      setToast({ message: "Failed to save. Try again.", type: "error" });
     }
 
     setSaving(false);
@@ -217,11 +217,6 @@ export default function HeroManager({ userRole }: { userRole: string }) {
             </h1>
           </div>
           <div className="flex items-center gap-4">
-            {message && (
-              <p className={`text-xs px-3 py-1.5 rounded ${message.includes("fail") || message.includes("Failed") ? "bg-red-500/10 text-red-500" : "bg-green-500/10 text-green-500"}`}>
-                {message}
-              </p>
-            )}
             <button
               onClick={handlePublish}
               disabled={slides.length === 0 || saving}
@@ -409,6 +404,11 @@ export default function HeroManager({ userRole }: { userRole: string }) {
           }}
           onCancel={() => setShowVideoUploader(false)}
         />
+      )}
+
+      {/* Toast notification */}
+      {toast && (
+        <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />
       )}
     </div>
   );
