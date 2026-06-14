@@ -248,9 +248,11 @@ export default function Home() {
             </div>
             <div className="space-y-2 text-sm text-[#a3a3a3]">
               <p className="uppercase tracking-[0.15em] text-[#f5f5f5] text-xs mb-4">Quick Links</p>
-              <a href="#projects" className="block hover:text-white transition-colors duration-300">Projects</a>
               <a href="#about" className="block hover:text-white transition-colors duration-300">About</a>
+              <a href="#projects" className="block hover:text-white transition-colors duration-300">Services</a>
+              <a href="#reviews" className="block hover:text-white transition-colors duration-300">Reviews</a>
               <a href="#contact" className="block hover:text-white transition-colors duration-300">Contact</a>
+              <a href="/admin/login" className="block hover:text-white transition-colors duration-300">Admin</a>
             </div>
             <div className="space-y-2 text-sm text-[#a3a3a3]">
               <p className="uppercase tracking-[0.15em] text-[#f5f5f5] text-xs mb-4">Contact</p>
@@ -273,8 +275,9 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <div className="max-w-6xl mx-auto mt-12 pt-8 border-t border-[#262626] text-xs text-[#a3a3a3]">
+          <div className="max-w-6xl mx-auto mt-12 pt-8 border-t border-[#262626] text-xs text-[#a3a3a3] flex flex-col md:flex-row justify-between items-center gap-2">
             <p>&copy; 2026 Katyal Architects. All rights reserved.</p>
+            <p>Made with 🤍 by <a href="https://github.com/Stratonov16" target="_blank" className="hover:text-white transition-colors">Nikhil</a></p>
           </div>
         </footer>
       </main>
