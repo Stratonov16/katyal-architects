@@ -68,7 +68,7 @@ html {
   top: 0;
   left: 0;
   height: 3px;
-  background: #22c55e;
+  background: #404040;
   z-index: 9999;
   transition: width 0.1s ease-out;
 }
