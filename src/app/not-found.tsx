@@ -6,8 +6,12 @@ export default function NotFound() {
     <div className="min-h-screen bg-[var(--bg)]">
       <AdminHeader />
       <div className="flex flex-col items-center justify-center min-h-screen px-6">
-        {/* Oreo's photo placeholder */}
-        <div className="w-48 h-48 rounded-full bg-[var(--border)] mb-8" />
+        {/* Oreo's photo */}
+        <img
+          src="https://pub-79d22fbf37e444a896d6acc795f2444b.r2.dev/static/oreo/WhatsApp%20Image%202026-06-15%20at%201.39.13%20AM.jpeg"
+          alt="Oreo"
+          className="w-48 h-48 rounded-full object-cover mb-8"
+        />
 
         <p className="text-sm text-[var(--text-muted)] mt-4 text-center max-w-sm">
           Oops! Oreo couldn&apos;t find this page. Maybe he buried it in the backyard.
