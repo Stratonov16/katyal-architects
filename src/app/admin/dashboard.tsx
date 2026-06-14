@@ -19,6 +19,7 @@ export default function AdminDashboard({ user }: { user: AuthUser }) {
     { name: "Team", href: "/admin/team", description: "Manage team members" },
     { name: "Reviews", href: "/admin/reviews", description: "Manage client testimonials" },
     { name: "About", href: "/admin/about", description: "Edit firm description and photo" },
+    { name: "Careers", href: "/admin/careers", description: "Manage job postings" },
     { name: "Contact", href: "/admin/contact", description: "Update contact information" },
   ];
 

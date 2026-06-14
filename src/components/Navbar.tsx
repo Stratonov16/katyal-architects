@@ -63,7 +63,7 @@ export default function Navbar() {
               </div>
             )}
           </div>
-          <a href="#careers" className="hover:opacity-60 transition-opacity">CAREERS</a>
+          <a href="/careers" className="hover:opacity-60 transition-opacity">CAREERS</a>
           <div className="relative">
             <button
               onClick={() => { setConnectOpen(!connectOpen); setServicesOpen(false); }}
