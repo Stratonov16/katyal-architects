@@ -134,14 +134,6 @@ html {
   animation: loader-fade-in 0.8s ease-out 0.7s both;
 }
 
-@keyframes loader-bar {
-  from { width: 0%; }
-  to { width: 100%; }
-}
-.animate-loader-bar {
-  animation: loader-bar 1.4s ease-in-out both;
-}
-
 /* Gallery image scroll reveal — starts clipped, grows to full */
 .gallery-image {
   overflow: hidden;

@@ -51,11 +51,6 @@ export default function Loader() {
       <p className="mt-2 text-[9px] uppercase tracking-[0.3em] text-[var(--text-muted)] animate-loader-tagline">
         Driven by Vision, Defined by Impact
       </p>
-
-      {/* Thin progress line */}
-      <div className="mt-8 w-32 h-px bg-[var(--border)] overflow-hidden">
-        <div className="h-full bg-[var(--text)] animate-loader-bar" />
-      </div>
     </div>
   );
 }
