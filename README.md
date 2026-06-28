@@ -1,8 +1,8 @@
-# Katyal Architects — Portfolio Website & CMS
+# Katyal Architects Portfolio Website & CMS
 
 A custom-built portfolio website and content management system for **Katyal Architects**, an architecture and interior design firm led by Shubham Katyal.
 
-**Live:** [katyal-architects.pages.dev](https://katyal-architects.pages.dev)
+**Live:** [katyal-architects.pages.dev](https://katyalarchitects.com)
 
 ---
 
