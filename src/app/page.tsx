@@ -108,7 +108,7 @@ export default function Home() {
 
       <main className="" ref={sectionsRef}>
         {/* 1. Hero — Auto-rotating Project Carousel */}
-        <section className="relative h-[88vh] flex items-end overflow-hidden">
+        <section className="relative min-h-screen flex items-end overflow-hidden">
           {/* Background media from D1/R2 */}
           {heroSlides.length > 0 ? (
             heroSlides.map((slide, i) => {
@@ -202,6 +202,17 @@ export default function Home() {
               </div>
             )}
           </div>
+
+          {/* Scroll-down indicator */}
+          <a
+            href="#about"
+            className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-1 text-white/70 hover:text-white transition-colors animate-bounce-slow"
+            aria-label="Scroll down"
+          >
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </a>
         </section>
 
         {/* 2. About / Firm */}
