@@ -426,7 +426,7 @@ export default function Home() {
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
                 {contact?.address || "2/108 Housing Board Colony, Hanumangarh, Rajasthan"} ↗
               </a>
-              <p className="text-[#a3a3a3]">{contact?.email || "ar.shubhamkatyal@gmail.com"}</p>
+              <p className="text-[#a3a3a3]">{contact?.email || "info@katyalarchitects.com"}</p>
               <p className="text-[#a3a3a3]">{contact?.phone || "+91 6377432778"}</p>
               <div className="flex items-center gap-3 mt-3">
                 <a href="https://instagram.com/katyal_architects" target="_blank" className="hover:text-white transition-colors">

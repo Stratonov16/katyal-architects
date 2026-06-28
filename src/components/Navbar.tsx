@@ -161,7 +161,7 @@ export default function Navbar() {
             <div className="mb-4"><Logo size="lg" /></div>
             <div className="text-[10px] text-[var(--text-muted)] space-y-2">
               <p>@katyal_architects</p>
-              <p>ar.shubhamkatyal@gmail.com</p>
+              <p>info@katyalarchitects.com</p>
             </div>
           </div>
         </div>

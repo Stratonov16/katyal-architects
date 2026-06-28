@@ -93,7 +93,7 @@ export default function RootLayout({
               url: SITE_URL,
               logo: LOGO_URL,
               image: LOGO_URL,
-              email: "ar.shubhamkatyal@gmail.com",
+              email: "info@katyalarchitects.com",
               telephone: "+91-6377432778",
               founder: { "@type": "Person", name: "Shubham Katyal", jobTitle: "Principal Architect" },
               address: {

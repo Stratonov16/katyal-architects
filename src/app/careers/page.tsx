@@ -77,7 +77,7 @@ export default async function CareersPage() {
           ) : (
             <div className="text-center py-16 border border-[var(--border)] rounded-md">
               <p className="text-[var(--text-muted)] text-sm">No open positions right now.</p>
-              <p className="text-[10px] text-[var(--text-muted)] mt-2">Send your portfolio to ar.shubhamkatyal@gmail.com</p>
+              <p className="text-[10px] text-[var(--text-muted)] mt-2">Send your portfolio to info@katyalarchitects.com</p>
             </div>
           )}
 
