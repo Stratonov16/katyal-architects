@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import AdminHeader from "@/components/AdminHeader";
 import Toast from "@/components/Toast";
+import VideoUploader from "@/components/VideoUploader";
 import { uploadFileWithProgress } from "@/lib/upload";
 
 type Project = {
@@ -60,6 +61,9 @@ export default function ProjectsManager({ userRole }: { userRole: string }) {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadCurrent, setUploadCurrent] = useState(0);
   const [uploadTotal, setUploadTotal] = useState(0);
+  const [showVideoUploader, setShowVideoUploader] = useState(false);
+  const [videoUploading, setVideoUploading] = useState(false);
+  const [videoProgress, setVideoProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Load existing projects
@@ -139,6 +143,27 @@ export default function ProjectsManager({ userRole }: { userRole: string }) {
     }));
     setNewImages([...newImages, ...files]);
     e.target.value = "";
+  };
+
+  // Called when a video is chosen via the uploader (MP4 upload or YouTube URL)
+  const handleVideoSelect = async (video: { type: "upload" | "youtube"; file?: File; youtubeId?: string; youtubeUrl?: string }) => {
+    setShowVideoUploader(false);
+    if (video.type === "youtube" && video.youtubeUrl) {
+      setVideoUrl(video.youtubeUrl);
+      return;
+    }
+    if (video.type === "upload" && video.file) {
+      setVideoUploading(true);
+      setVideoProgress(0);
+      try {
+        const { url } = await uploadFileWithProgress(video.file, "projects/videos", (p) => setVideoProgress(p.percent));
+        setVideoUrl(url);
+        setToast({ message: "Video uploaded", type: "success" });
+      } catch (err) {
+        setToast({ message: err instanceof Error ? err.message : "Video upload failed", type: "error" });
+      }
+      setVideoUploading(false);
+    }
   };
 
   // Total images count (existing not deleted + new)
@@ -295,13 +320,57 @@ export default function ProjectsManager({ userRole }: { userRole: string }) {
                 rows={4}
                 className="w-full bg-transparent border border-[var(--border)] rounded-md p-3 text-sm outline-none focus:border-[var(--text)] transition-colors resize-none"
               />
-              <input
-                type="text"
-                placeholder="Video URL (optional — YouTube or MP4)"
-                value={videoUrl}
-                onChange={(e) => setVideoUrl(e.target.value)}
-                className="w-full bg-transparent border-b border-[var(--border)] py-3 text-sm outline-none focus:border-[var(--text)] transition-colors"
-              />
+              {/* Video — upload an MP4 or paste a URL */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)]">Video (optional)</p>
+                  <button
+                    type="button"
+                    onClick={() => setShowVideoUploader(true)}
+                    className="text-[10px] uppercase tracking-[0.15em] border border-[var(--border)] rounded px-3 py-1.5 hover:border-[var(--text)] transition-colors"
+                  >
+                    + Upload / YouTube
+                  </button>
+                </div>
+
+                {videoUploading && (
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)]">Uploading video</p>
+                      <p className="text-[10px] tabular-nums text-[var(--text-muted)]">{videoProgress}%</p>
+                    </div>
+                    <div className="w-full h-1.5 bg-[var(--border)] rounded-full overflow-hidden">
+                      <div className="h-full bg-[var(--text)] transition-all duration-200 ease-out" style={{ width: `${videoProgress}%` }} />
+                    </div>
+                  </div>
+                )}
+
+                <input
+                  type="text"
+                  placeholder="…or paste a video URL (YouTube or MP4)"
+                  value={videoUrl}
+                  onChange={(e) => setVideoUrl(e.target.value)}
+                  className="w-full bg-transparent border-b border-[var(--border)] py-3 text-sm outline-none focus:border-[var(--text)] transition-colors"
+                />
+
+                {videoUrl && !videoUploading && (
+                  <div className="flex items-center gap-3 text-[10px] text-[var(--text-muted)]">
+                    {videoUrl.endsWith(".mp4") || videoUrl.endsWith(".webm") ? (
+                      <video src={videoUrl} className="w-28 aspect-video object-cover rounded bg-black" muted playsInline />
+                    ) : (
+                      <span className="px-2 py-1 rounded bg-[var(--border)]">YouTube link</span>
+                    )}
+                    <span className="truncate flex-1">{videoUrl}</span>
+                    <button
+                      type="button"
+                      onClick={() => setVideoUrl("")}
+                      className="text-red-500 hover:underline flex-shrink-0"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                )}
+              </div>
 
               {/* Image section */}
               <div>
@@ -452,6 +521,14 @@ export default function ProjectsManager({ userRole }: { userRole: string }) {
           )}
         </div>
       </div>
+
+      {/* Video uploader modal */}
+      {showVideoUploader && (
+        <VideoUploader
+          onSelect={handleVideoSelect}
+          onCancel={() => setShowVideoUploader(false)}
+        />
+      )}
 
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
     </div>

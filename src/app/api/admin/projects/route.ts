@@ -84,6 +84,14 @@ export async function PUT(request: NextRequest) {
   if (!id) return NextResponse.json({ error: "Project ID required" }, { status: 400 });
 
   if (user.role === "super_admin") {
+    // If the video changed, delete the old uploaded video file from R2
+    // (deleteByUrl safely ignores non-R2 URLs like YouTube links).
+    const prev = await query<{ video_url: string }>(`SELECT video_url FROM projects WHERE id=?`, [id]);
+    const oldVideo = prev[0]?.video_url;
+    if (oldVideo && oldVideo !== (video_url || "")) {
+      await deleteByUrl(oldVideo);
+    }
+
     await execute(
       `UPDATE projects SET title=?, slug=?, category=?, description=?, location=?, year=?, video_url=?, status='published', updated_at=datetime('now') WHERE id=?`,
       [title, slug, category, description || "", location || "", year || 2026, video_url || "", id]
@@ -145,6 +153,10 @@ export async function DELETE(request: NextRequest) {
     for (const img of images) {
       if (img.image_url) await deleteByUrl(img.image_url);
     }
+    // Delete the uploaded video file too (no-op for YouTube/external URLs)
+    const proj = await query<{ video_url: string }>(`SELECT video_url FROM projects WHERE id=?`, [id]);
+    if (proj[0]?.video_url) await deleteByUrl(proj[0].video_url);
+
     await execute(`DELETE FROM project_images WHERE project_id=?`, [id]);
     await execute(`DELETE FROM projects WHERE id=?`, [id]);
     return NextResponse.json({ success: true, message: "Deleted" });

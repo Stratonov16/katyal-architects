@@ -67,7 +67,7 @@ export default function Navbar() {
           <div className="relative">
             <button
               onClick={() => { setConnectOpen(!connectOpen); setServicesOpen(false); }}
-              className="px-3.5 py-1.5 rounded-md font-medium bg-[var(--contact-bg)] hover:bg-[var(--contact-bg-hover)] text-[var(--contact-text)] transition-colors duration-200"
+              className="contact-cta"
             >
               CONTACT US
             </button>
