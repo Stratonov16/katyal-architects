@@ -1,6 +1,6 @@
 import { MetadataRoute } from "next";
 
-const SITE_URL = "https://katyal-architects.pages.dev";
+const SITE_URL = "https://katyalarchitects.com";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const categories = ["residential", "hospitality", "interiors", "landscape", "commercial", "township"];

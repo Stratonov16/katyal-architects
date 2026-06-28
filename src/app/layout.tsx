@@ -14,7 +14,7 @@ const outfit = Outfit({
   variable: "--font-body",
 });
 
-const SITE_URL = "https://katyal-architects.pages.dev";
+const SITE_URL = "https://katyalarchitects.com";
 const LOGO_URL = "https://pub-79d22fbf37e444a896d6acc795f2444b.r2.dev/static/logo/logo.jpg";
 
 export const metadata: Metadata = {

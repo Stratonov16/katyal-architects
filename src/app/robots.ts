@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/admin/", "/api/"],
       },
     ],
-    sitemap: "https://katyal-architects.pages.dev/sitemap.xml",
+    sitemap: "https://katyalarchitects.com/sitemap.xml",
   };
 }
