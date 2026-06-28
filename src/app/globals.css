@@ -34,8 +34,8 @@
   --hero-shade: rgba(255, 255, 255, 0.35);
   --arrow-icon: #0a0a0a;
   /* Contact CTA — light mode: filled golden button (AWS-style) */
-  --contact-bg: #fffc47;
-  --contact-bg-hover: #d8961f;
+  --contact-bg: #fef297;
+  --contact-bg-hover: #ffee56f5;
   --contact-text: #1a1a1a;
 }
 
