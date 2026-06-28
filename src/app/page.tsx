@@ -9,7 +9,7 @@ export default function Home() {
   const reviewIndex = useRef(0);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [activeTeamMember, setActiveTeamMember] = useState<string | null>(null);
-  const [heroSlides, setHeroSlides] = useState<{image_url: string; project_title: string; project_link: string}[]>([]);
+  const [heroSlides, setHeroSlides] = useState<{image_url: string; project_title: string; project_link: string; location?: string}[]>([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [about, setAbout] = useState<{headline: string; description: string; photo_url: string} | null>(null);
   const [reviews, setReviews] = useState<{client_name: string; project_name: string; quote: string; photo_url: string}[]>([]);
@@ -30,7 +30,7 @@ export default function Home() {
     if (heroSlides.length <= 1) return;
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-    }, 5000);
+    }, 4000);
     return () => clearInterval(timer);
   }, [heroSlides.length]);
 
@@ -108,7 +108,7 @@ export default function Home() {
 
       <main className="" ref={sectionsRef}>
         {/* 1. Hero — Auto-rotating Project Carousel */}
-        <section className="relative min-h-screen flex items-end overflow-hidden">
+        <section className="relative h-[88vh] flex items-end overflow-hidden">
           {/* Background media from D1/R2 */}
           {heroSlides.length > 0 ? (
             heroSlides.map((slide, i) => {
@@ -118,7 +118,7 @@ export default function Home() {
               const youtubeId = isYoutube ? url.match(/vi\/([^/]+)/)?.[1] || url.match(/embed\/([^?]+)/)?.[1] || url.match(/v=([^&]+)/)?.[1] : null;
 
               return (
-                <div key={i} className={`absolute inset-0 transition-opacity duration-1000 ${i === currentSlide ? "opacity-100" : "opacity-0"}`}>
+                <div key={i} className={`absolute inset-0 transition-opacity duration-700 ${i === currentSlide ? "opacity-100" : "opacity-0"}`}>
                   {isVideo ? (
                     <video
                       src={url}
@@ -153,9 +153,9 @@ export default function Home() {
           {/* Left arrow */}
           <button
             onClick={() => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length)}
-            className="absolute left-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full flex items-center justify-center text-white/80 hover:text-white hover:scale-110 transition-all duration-300"
+            className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 flex items-center justify-center text-white/70 hover:text-white hover:scale-110 transition-all duration-300"
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="15 18 9 12 15 6" />
             </svg>
           </button>
@@ -163,23 +163,43 @@ export default function Home() {
           {/* Right arrow */}
           <button
             onClick={() => setCurrentSlide((prev) => (prev + 1) % heroSlides.length)}
-            className="absolute right-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full flex items-center justify-center text-white/80 hover:text-white hover:scale-110 transition-all duration-300"
+            className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 flex items-center justify-center text-white/70 hover:text-white hover:scale-110 transition-all duration-300"
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="9 18 15 12 9 6" />
             </svg>
           </button>
 
-          {/* Project name at bottom */}
-          <div className="relative z-10 w-full p-6 md:p-10 bg-gradient-to-t from-black/60 to-transparent">
+          {/* Project name + dots at bottom */}
+          <div className="relative z-10 w-full px-8 md:px-16 pb-12 md:pb-16 pt-32 bg-gradient-to-t from-black/80 via-black/30 to-transparent">
             {heroSlides.length > 0 && heroSlides[currentSlide] ? (
-              <Link href={heroSlides[currentSlide].project_link || "#"}>
-                <p className="text-xs uppercase tracking-[0.15em] text-white/70 hover:text-white transition-colors">
+              <Link href={heroSlides[currentSlide].project_link || "#"} className="group inline-block">
+                <p className="text-[10px] uppercase tracking-[0.3em] text-white/60 mb-3">Featured Project</p>
+                <h2 className="text-3xl md:text-6xl font-light text-white tracking-wide group-hover:opacity-80 transition-opacity" style={{ fontFamily: "var(--font-display), serif" }}>
                   {heroSlides[currentSlide].project_title || ""}
-                </p>
+                </h2>
+                {heroSlides[currentSlide].location && (
+                  <p className="text-xs md:text-sm uppercase tracking-[0.2em] text-white/70 mt-2">
+                    {heroSlides[currentSlide].location}
+                  </p>
+                )}
               </Link>
             ) : (
-              <p className="text-xs uppercase tracking-[0.15em] text-white/70">Loading...</p>
+              <p className="text-sm uppercase tracking-[0.15em] text-white/60">Loading...</p>
+            )}
+
+            {/* Dot indicators */}
+            {heroSlides.length > 1 && (
+              <div className="flex gap-2 mt-6">
+                {heroSlides.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setCurrentSlide(i)}
+                    className={`h-1 rounded-full transition-all duration-300 ${i === currentSlide ? "w-8 bg-white" : "w-4 bg-white/40 hover:bg-white/60"}`}
+                    aria-label={`Go to slide ${i + 1}`}
+                  />
+                ))}
+              </div>
             )}
           </div>
         </section>
