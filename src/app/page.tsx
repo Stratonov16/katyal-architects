@@ -155,28 +155,24 @@ export default function Home() {
             <div className="absolute inset-0 bg-[var(--border)]" />
           )}
 
-          {/* Left edge shade — full-height gradient behind the arrow (visual only) */}
-          <div className="absolute left-0 top-0 bottom-0 z-10 w-8 md:w-12 bg-gradient-to-r from-[var(--hero-shade)] to-transparent pointer-events-none" />
-          {/* Left arrow — bare chevron, theme-aware color */}
+          {/* Left arrow — bare chevron, no backing, theme-aware color */}
           <button
             onClick={() => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length)}
-            className="group absolute left-0 md:left-1 top-1/2 -translate-y-1/2 z-20 w-10 h-20 flex items-center justify-center text-[var(--arrow-icon)]"
+            className="group absolute left-1 md:left-3 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center text-[var(--arrow-icon)]"
             aria-label="Previous slide"
           >
-            <svg width="40" height="56" viewBox="0 0 24 32" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-80 group-hover:opacity-100 group-hover:-translate-x-0.5 transition-all duration-300">
+            <svg viewBox="0 0 24 32" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-9 md:w-8 md:h-11 opacity-90 group-hover:opacity-100 group-hover:-translate-x-0.5 transition-all duration-300 [filter:drop-shadow(0_1px_2px_rgba(0,0,0,0.4))]">
               <polyline points="16 24 8 16 16 8" />
             </svg>
           </button>
 
-          {/* Right edge shade — full-height gradient behind the arrow (visual only) */}
-          <div className="absolute right-0 top-0 bottom-0 z-10 w-8 md:w-12 bg-gradient-to-l from-[var(--hero-shade)] to-transparent pointer-events-none" />
-          {/* Right arrow — bare chevron, theme-aware color */}
+          {/* Right arrow — bare chevron, no backing, theme-aware color */}
           <button
             onClick={() => setCurrentSlide((prev) => (prev + 1) % heroSlides.length)}
-            className="group absolute right-0 md:right-1 top-1/2 -translate-y-1/2 z-20 w-10 h-20 flex items-center justify-center text-[var(--arrow-icon)]"
+            className="group absolute right-1 md:right-3 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center text-[var(--arrow-icon)]"
             aria-label="Next slide"
           >
-            <svg width="40" height="56" viewBox="0 0 24 32" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-80 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-300">
+            <svg viewBox="0 0 24 32" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-9 md:w-8 md:h-11 opacity-90 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-300 [filter:drop-shadow(0_1px_2px_rgba(0,0,0,0.4))]">
               <polyline points="8 24 16 16 8 8" />
             </svg>
           </button>
