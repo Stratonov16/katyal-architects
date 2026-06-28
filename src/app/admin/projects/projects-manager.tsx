@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import AdminHeader from "@/components/AdminHeader";
 import Toast from "@/components/Toast";
+import { uploadFileWithProgress } from "@/lib/upload";
 
 type Project = {
   id: number;
@@ -56,6 +57,9 @@ export default function ProjectsManager({ userRole }: { userRole: string }) {
   const [newImages, setNewImages] = useState<NewImage[]>([]);
   const [featuredIndex, setFeaturedIndex] = useState(0);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadCurrent, setUploadCurrent] = useState(0);
+  const [uploadTotal, setUploadTotal] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Load existing projects
@@ -143,18 +147,27 @@ export default function ProjectsManager({ userRole }: { userRole: string }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setUploading(true);
+    setUploadCurrent(0);
+    setUploadTotal(newImages.length);
+    setUploadProgress(0);
 
-    // Upload new images first
+    // Upload new images first — one at a time, with per-file progress
     const uploadedUrls: string[] = [];
     const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/-+$/, "");
-    for (const img of newImages) {
-      const formData = new FormData();
-      formData.append("file", img.file);
-      formData.append("folder", `projects/${slug}`);
-      const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
-      if (res.ok) {
-        const data = await res.json();
-        uploadedUrls.push(data.url);
+    for (let i = 0; i < newImages.length; i++) {
+      setUploadCurrent(i + 1);
+      setUploadProgress(0);
+      try {
+        const { url } = await uploadFileWithProgress(
+          newImages[i].file,
+          `projects/${slug}`,
+          (p) => setUploadProgress(p.percent)
+        );
+        uploadedUrls.push(url);
+      } catch (err) {
+        setToast({ message: err instanceof Error ? err.message : "Image upload failed", type: "error" });
+        setUploading(false);
+        return;
       }
     }
 
@@ -366,6 +379,24 @@ export default function ProjectsManager({ userRole }: { userRole: string }) {
                   />
                 </div>
               </div>
+
+              {/* Upload progress bar */}
+              {uploading && uploadTotal > 0 && (
+                <div className="pt-2">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)]">
+                      Uploading image {uploadCurrent} of {uploadTotal}
+                    </p>
+                    <p className="text-[10px] tabular-nums text-[var(--text-muted)]">{uploadProgress}%</p>
+                  </div>
+                  <div className="w-full h-1.5 bg-[var(--border)] rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-[var(--text)] transition-all duration-200 ease-out"
+                      style={{ width: `${uploadProgress}%` }}
+                    />
+                  </div>
+                </div>
+              )}
 
               {/* Actions */}
               <div className="flex gap-3 pt-4">

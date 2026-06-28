@@ -215,7 +215,7 @@ export default function Home() {
         </section>
 
         {/* 2. About / Firm */}
-        <section id="about" className="reveal py-32 px-8">
+        <section id="about" className="reveal py-26 px-8">
           <div className="max-w-3xl mx-auto text-center">
             <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-muted)] mb-8">About the Firm</p>
             {about?.photo_url && (

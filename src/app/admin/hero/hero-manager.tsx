@@ -5,6 +5,7 @@ import ImageCropper, { CropData } from "@/components/ImageCropper";
 import VideoUploader from "@/components/VideoUploader";
 import AdminHeader from "@/components/AdminHeader";
 import Toast from "@/components/Toast";
+import { uploadFileWithProgress } from "@/lib/upload";
 
 type HeroSlide = {
   id: string;
@@ -21,6 +22,8 @@ export default function HeroManager({ userRole }: { userRole: string }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadLabel, setUploadLabel] = useState("");
   const [projectsList, setProjectsList] = useState<{id: number; title: string; slug: string; category: string}[]>([]);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -58,31 +61,19 @@ export default function HeroManager({ userRole }: { userRole: string }) {
     fetchData();
   }, []);
 
-  // Upload image to R2
+  // Upload image/video to R2 with live progress
   const uploadImage = async (file: File): Promise<string | null> => {
     setUploading(true);
+    setUploadProgress(0);
+    setUploadLabel(file.name);
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("folder", "hero");
-
-      const res = await fetch("/api/admin/upload", {
-        method: "POST",
-        body: formData,
+      const { url } = await uploadFileWithProgress(file, "hero", (p) => {
+        setUploadProgress(p.percent);
       });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setToast({ message: data.error || "Upload failed", type: "error" });
-        setUploading(false);
-        return null;
-      }
-
       setUploading(false);
-      return data.url;
-    } catch {
-      setToast({ message: "Upload failed", type: "error" });
+      return url;
+    } catch (err) {
+      setToast({ message: err instanceof Error ? err.message : "Upload failed", type: "error" });
       setUploading(false);
       return null;
     }
@@ -232,9 +223,29 @@ export default function HeroManager({ userRole }: { userRole: string }) {
           </div>
         </div>
 
-        {/* Uploading indicator */}
+        {/* Uploading progress bar */}
         {uploading && (
-          <div className="mb-4 text-xs text-[var(--text-muted)] animate-pulse">Uploading image...</div>
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] truncate pr-4">
+                Uploading {uploadLabel}
+              </p>
+              <p className="text-[10px] tabular-nums text-[var(--text-muted)]">
+                {uploadProgress}%
+              </p>
+            </div>
+            <div className="w-full h-1.5 bg-[var(--border)] rounded-full overflow-hidden">
+              <div
+                className="h-full bg-[var(--text)] transition-all duration-200 ease-out"
+                style={{ width: `${uploadProgress}%` }}
+              />
+            </div>
+            {uploadProgress === 100 && (
+              <p className="text-[9px] text-[var(--text-muted)] mt-1.5">
+                Processing on server…
+              </p>
+            )}
+          </div>
         )}
 
         {/* Live preview */}
