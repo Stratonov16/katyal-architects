@@ -125,11 +125,11 @@ export default function AboutManager({ userRole }: { userRole: string }) {
           {/* Photo — rectangular (portrait) */}
           <div className="flex items-start gap-6">
             <div
-              className="w-40 aspect-[4/5] rounded-md bg-[var(--border)] cursor-pointer overflow-hidden flex items-center justify-center hover:opacity-80 transition-opacity flex-shrink-0"
+              className={`w-40 rounded-md bg-[var(--border)] cursor-pointer overflow-hidden flex items-center justify-center hover:opacity-80 transition-opacity flex-shrink-0 ${photoPreview ? "" : "aspect-[4/5]"}`}
               onClick={() => fileInputRef.current?.click()}
             >
               {photoPreview ? (
-                <img src={photoPreview} alt="" className="w-full h-full object-cover" />
+                <img src={photoPreview} alt="" className="w-full h-auto" />
               ) : (
                 <span className="text-[9px] text-[var(--text-muted)]">+ Photo</span>
               )}

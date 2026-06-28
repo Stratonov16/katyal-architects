@@ -16,37 +16,35 @@ type AspectPreset = {
   value: number;
 };
 
+// Sentinel: lock the crop to the uploaded image's own natural ratio.
+const ORIGINAL = -1;
+
+// A rich, shared set of ratios. Each type just picks a sensible default order.
+const LANDSCAPE: AspectPreset[] = [
+  { label: "16:9", value: 16 / 9 },
+  { label: "16:7", value: 16 / 7 },
+  { label: "21:9", value: 21 / 9 },
+  { label: "3:2", value: 3 / 2 },
+  { label: "4:3", value: 4 / 3 },
+  { label: "5:4", value: 5 / 4 },
+];
+const SQUARE: AspectPreset[] = [{ label: "1:1", value: 1 }];
+const PORTRAIT: AspectPreset[] = [
+  { label: "4:5", value: 4 / 5 },
+  { label: "3:4", value: 3 / 4 },
+  { label: "2:3", value: 2 / 3 },
+  { label: "9:16", value: 9 / 16 },
+];
+const ORIGINAL_FREE: AspectPreset[] = [
+  { label: "Original", value: ORIGINAL },
+  { label: "Free", value: 0 },
+];
+
 const ASPECT_PRESETS: Record<string, AspectPreset[]> = {
-  hero: [
-    { label: "16:9", value: 16 / 9 },
-    { label: "16:7", value: 16 / 7 },
-    { label: "21:9", value: 21 / 9 },
-    { label: "4:3", value: 4 / 3 },
-    { label: "3:2", value: 3 / 2 },
-    { label: "1:1", value: 1 },
-    { label: "Free", value: 0 },
-  ],
-  project: [
-    { label: "4:3", value: 4 / 3 },
-    { label: "3:2", value: 3 / 2 },
-    { label: "16:9", value: 16 / 9 },
-    { label: "1:1", value: 1 },
-    { label: "9:16", value: 9 / 16 },
-    { label: "2:3", value: 2 / 3 },
-    { label: "Free", value: 0 },
-  ],
-  profile: [
-    { label: "1:1", value: 1 },
-    { label: "4:5", value: 4 / 5 },
-    { label: "Free", value: 0 },
-  ],
-  portrait: [
-    { label: "4:5", value: 4 / 5 },
-    { label: "3:4", value: 3 / 4 },
-    { label: "2:3", value: 2 / 3 },
-    { label: "1:1", value: 1 },
-    { label: "Free", value: 0 },
-  ],
+  hero: [...ORIGINAL_FREE, ...LANDSCAPE, ...SQUARE, ...PORTRAIT],
+  project: [...ORIGINAL_FREE, ...LANDSCAPE, ...SQUARE, ...PORTRAIT],
+  profile: [...ORIGINAL_FREE, ...SQUARE, ...PORTRAIT],
+  portrait: [...ORIGINAL_FREE, ...PORTRAIT, ...SQUARE, ...LANDSCAPE],
 };
 
 type ImageCropperProps = {
@@ -61,8 +59,20 @@ export default function ImageCropper({ imageUrl, type, initialCrop, onApply, onC
   const presets = ASPECT_PRESETS[type];
   const [crop, setCrop] = useState({ x: initialCrop?.x || 0, y: initialCrop?.y || 0 });
   const [zoom, setZoom] = useState(initialCrop?.zoom || 1);
-  const [aspect, setAspect] = useState(initialCrop?.aspect || presets[0].value);
+  // Default to "Original" so the crop matches whatever ratio was uploaded.
+  const [aspect, setAspect] = useState(initialCrop?.aspect || ORIGINAL);
+  const [naturalAspect, setNaturalAspect] = useState(0);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<CropData["croppedAreaPixels"]>(null);
+
+  // The aspect actually passed to the cropper: "Original" resolves to the
+  // image's natural ratio (once known); "Free" (0) means unconstrained.
+  const effectiveAspect = aspect === ORIGINAL ? naturalAspect || undefined : aspect || undefined;
+
+  const onMediaLoaded = useCallback((mediaSize: { naturalWidth: number; naturalHeight: number }) => {
+    if (mediaSize.naturalWidth && mediaSize.naturalHeight) {
+      setNaturalAspect(mediaSize.naturalWidth / mediaSize.naturalHeight);
+    }
+  }, []);
 
   const onCropComplete = useCallback((_: unknown, croppedPixels: { x: number; y: number; width: number; height: number }) => {
     setCroppedAreaPixels(croppedPixels);
@@ -73,7 +83,9 @@ export default function ImageCropper({ imageUrl, type, initialCrop, onApply, onC
       x: crop.x,
       y: crop.y,
       zoom,
-      aspect,
+      // Store the resolved aspect (Original → natural ratio) so consumers
+      // that re-open the crop get the same framing.
+      aspect: effectiveAspect || 0,
       croppedAreaPixels,
     });
   };
@@ -87,10 +99,11 @@ export default function ImageCropper({ imageUrl, type, initialCrop, onApply, onC
             image={imageUrl}
             crop={crop}
             zoom={zoom}
-            aspect={aspect || undefined}
+            aspect={effectiveAspect}
             onCropChange={setCrop}
             onZoomChange={setZoom}
             onCropComplete={onCropComplete}
+            onMediaLoaded={onMediaLoaded}
             showGrid={true}
             cropShape={type === "profile" && aspect === 1 ? "round" : "rect"}
           />

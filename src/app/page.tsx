@@ -156,7 +156,7 @@ export default function Home() {
           )}
 
           {/* Left edge shade — full-height gradient behind the arrow (visual only) */}
-          <div className="absolute left-0 top-0 bottom-0 z-10 w-16 md:w-24 bg-gradient-to-r from-[var(--hero-shade)] to-transparent pointer-events-none" />
+          <div className="absolute left-0 top-0 bottom-0 z-10 w-8 md:w-12 bg-gradient-to-r from-[var(--hero-shade)] to-transparent pointer-events-none" />
           {/* Left arrow — bare chevron, theme-aware color */}
           <button
             onClick={() => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length)}
@@ -169,7 +169,7 @@ export default function Home() {
           </button>
 
           {/* Right edge shade — full-height gradient behind the arrow (visual only) */}
-          <div className="absolute right-0 top-0 bottom-0 z-10 w-16 md:w-24 bg-gradient-to-l from-[var(--hero-shade)] to-transparent pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 z-10 w-8 md:w-12 bg-gradient-to-l from-[var(--hero-shade)] to-transparent pointer-events-none" />
           {/* Right arrow — bare chevron, theme-aware color */}
           <button
             onClick={() => setCurrentSlide((prev) => (prev + 1) % heroSlides.length)}
@@ -233,7 +233,7 @@ export default function Home() {
               <img
                 src={about.photo_url}
                 alt="About"
-                className="w-48 md:w-56 aspect-[4/5] rounded-md object-cover mx-auto mb-8"
+                className="max-w-xs md:max-w-sm w-full h-auto rounded-md mx-auto mb-8"
               />
             )}
             <h2 className="text-3xl md:text-5xl font-light leading-tight">
