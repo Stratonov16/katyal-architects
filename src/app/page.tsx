@@ -213,16 +213,18 @@ export default function Home() {
             )}
           </div>
 
-          {/* Scroll-down indicator — original bare chevron */}
-          <a
-            href="#about"
-            className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-1 text-white/70 hover:text-white transition-colors animate-bounce-slow"
-            aria-label="Scroll down"
-          >
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="6 9 12 15 18 9" />
-            </svg>
-          </a>
+          {/* Scroll-down indicator — original bare chevron, centered via flex wrapper */}
+          <div className="absolute bottom-6 inset-x-0 z-20 flex justify-center pointer-events-none">
+            <a
+              href="#about"
+              className="flex flex-col items-center gap-1 text-white/70 hover:text-white transition-colors animate-bounce-slow pointer-events-auto"
+              aria-label="Scroll down"
+            >
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </a>
+          </div>
         </section>
 
         {/* 2. About / Firm */}
