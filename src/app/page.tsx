@@ -218,23 +218,40 @@ export default function Home() {
         </section>
 
         {/* 2. About / Firm */}
-        <section id="about" className="reveal py-26 px-8">
-          <div className="max-w-3xl mx-auto text-center">
-            <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-muted)] mb-8">About the Firm</p>
-            {about?.photo_url && (
-              <img src={about.photo_url} alt="About" className="w-32 h-32 rounded-full mx-auto mb-8 object-cover" />
+        <section id="about" className="reveal pt-20 pb-12 px-8">
+          <div className="max-w-5xl mx-auto">
+            <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-muted)] mb-10 text-center">About the Firm</p>
+            {about?.photo_url ? (
+              <div className="grid grid-cols-1 md:grid-cols-[minmax(0,300px)_1fr] gap-8 md:gap-12 items-center">
+                <img
+                  src={about.photo_url}
+                  alt="About"
+                  className="w-full max-w-[280px] mx-auto md:max-w-none aspect-[4/5] rounded-md object-cover"
+                />
+                <div>
+                  <h2 className="text-2xl md:text-4xl font-light leading-tight">
+                    {about?.headline || "We design spaces that inspire, transform, and endure."}
+                  </h2>
+                  <p className="mt-6 text-[var(--text-muted)] leading-relaxed">
+                    {about?.description || "Katyal Architects is a design studio led by Shubham Katyal, creating architecture and interiors that balance bold vision with refined execution."}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="max-w-3xl mx-auto text-center">
+                <h2 className="text-3xl md:text-5xl font-light leading-tight">
+                  {about?.headline || "We design spaces that inspire, transform, and endure."}
+                </h2>
+                <p className="mt-8 text-[var(--text-muted)] leading-relaxed max-w-xl mx-auto">
+                  {about?.description || "Katyal Architects is a design studio led by Shubham Katyal, creating architecture and interiors that balance bold vision with refined execution."}
+                </p>
+              </div>
             )}
-            <h2 className="text-3xl md:text-5xl font-light leading-tight">
-              {about?.headline || "We design spaces that inspire, transform, and endure."}
-            </h2>
-            <p className="mt-8 text-[var(--text-muted)] leading-relaxed max-w-xl mx-auto">
-              {about?.description || "Katyal Architects is a design studio led by Shubham Katyal, creating architecture and interiors that balance bold vision with refined execution."}
-            </p>
           </div>
         </section>
 
         {/* 3. Projects — Grid of Rectangular Boxes */}
-        <section id="projects" className="reveal-grow py-24 px-8">
+        <section id="projects" className="reveal-grow pt-12 pb-24 px-8">
           <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-muted)] mb-12 text-center">Services</p>
           <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
             {(services.length > 0 ? services : [

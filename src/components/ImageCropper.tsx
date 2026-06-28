@@ -40,11 +40,18 @@ const ASPECT_PRESETS: Record<string, AspectPreset[]> = {
     { label: "4:5", value: 4 / 5 },
     { label: "Free", value: 0 },
   ],
+  portrait: [
+    { label: "4:5", value: 4 / 5 },
+    { label: "3:4", value: 3 / 4 },
+    { label: "2:3", value: 2 / 3 },
+    { label: "1:1", value: 1 },
+    { label: "Free", value: 0 },
+  ],
 };
 
 type ImageCropperProps = {
   imageUrl: string;
-  type: "hero" | "project" | "profile";
+  type: "hero" | "project" | "profile" | "portrait";
   initialCrop?: CropData;
   onApply: (cropData: CropData) => void;
   onCancel: () => void;

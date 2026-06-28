@@ -61,10 +61,8 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
-  icons: {
-    icon: LOGO_URL,
-    apple: LOGO_URL,
-  },
+  // Favicon / app icons are provided by the file-based convention:
+  // src/app/icon.png and src/app/apple-icon.png (auto-detected by Next.js).
 };
 
 export default function RootLayout({

@@ -3,7 +3,9 @@
 import { useState, useEffect, useRef } from "react";
 import AdminHeader from "@/components/AdminHeader";
 import Toast from "@/components/Toast";
+import ImageCropper, { CropData } from "@/components/ImageCropper";
 import { uploadFileWithProgress } from "@/lib/upload";
+import { getCroppedImageFile } from "@/lib/crop-image";
 
 export default function AboutManager({ userRole }: { userRole: string }) {
   const [headline, setHeadline] = useState("");
@@ -15,6 +17,9 @@ export default function AboutManager({ userRole }: { userRole: string }) {
   const [saving, setSaving] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+  // Cropping
+  const [rawImage, setRawImage] = useState<string | null>(null);
+  const [cropData, setCropData] = useState<CropData | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -31,6 +36,31 @@ export default function AboutManager({ userRole }: { userRole: string }) {
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    // Open the cropper with the raw selected image.
+    setRawImage(URL.createObjectURL(file));
+    e.target.value = "";
+  };
+
+  const handleCropApply = async (crop: CropData) => {
+    if (!rawImage || !crop.croppedAreaPixels) {
+      setRawImage(null);
+      return;
+    }
+    try {
+      // Bake the crop into a real file so the site shows the exact rectangle.
+      const croppedFile = await getCroppedImageFile(rawImage, crop.croppedAreaPixels, "about.jpg");
+      setPhoto(croppedFile);
+      setPhotoPreview(URL.createObjectURL(croppedFile));
+      setCropData(crop);
+    } catch {
+      setToast({ message: "Could not crop image", type: "error" });
+    }
+    setRawImage(null);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,10 +122,10 @@ export default function AboutManager({ userRole }: { userRole: string }) {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Photo */}
-          <div className="flex items-center gap-6">
+          {/* Photo — rectangular (portrait) */}
+          <div className="flex items-start gap-6">
             <div
-              className="w-24 h-24 rounded-full bg-[var(--border)] cursor-pointer overflow-hidden flex items-center justify-center hover:opacity-80 transition-opacity"
+              className="w-40 aspect-[4/5] rounded-md bg-[var(--border)] cursor-pointer overflow-hidden flex items-center justify-center hover:opacity-80 transition-opacity flex-shrink-0"
               onClick={() => fileInputRef.current?.click()}
             >
               {photoPreview ? (
@@ -108,13 +138,22 @@ export default function AboutManager({ userRole }: { userRole: string }) {
                 type="file"
                 accept="image/*"
                 className="hidden"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) { setPhoto(file); setPhotoPreview(URL.createObjectURL(file)); }
-                }}
+                onChange={handleFileSelect}
               />
             </div>
-            <p className="text-[10px] text-[var(--text-muted)]">Click to upload/change photo</p>
+            <div className="text-[10px] text-[var(--text-muted)] space-y-2 pt-1">
+              <p>Click to upload / change photo.</p>
+              <p>You can crop and pick the aspect ratio after selecting.</p>
+              {photoPreview && (
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="text-[10px] uppercase tracking-[0.15em] underline hover:text-[var(--text)] transition-colors"
+                >
+                  Replace photo
+                </button>
+              )}
+            </div>
           </div>
 
           <input
@@ -154,6 +193,17 @@ export default function AboutManager({ userRole }: { userRole: string }) {
           </button>
         </form>
       </div>
+
+      {/* Crop modal */}
+      {rawImage && (
+        <ImageCropper
+          imageUrl={rawImage}
+          type="portrait"
+          initialCrop={cropData || undefined}
+          onApply={handleCropApply}
+          onCancel={() => setRawImage(null)}
+        />
+      )}
 
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
     </div>
