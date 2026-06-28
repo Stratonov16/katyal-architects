@@ -1,6 +1,7 @@
 "use client";
 
 import Navbar from "@/components/Navbar";
+import Loader from "@/components/Loader";
 import Link from "next/link";
 import { useEffect, useRef, useCallback, useState } from "react";
 
@@ -104,6 +105,7 @@ export default function Home() {
 
   return (
     <>
+      <Loader />
       <Navbar />
 
       {/* Scroll progress bar */}
@@ -153,24 +155,28 @@ export default function Home() {
             <div className="absolute inset-0 bg-[var(--border)]" />
           )}
 
-          {/* Left arrow */}
+          {/* Left edge shade — full-height gradient behind the arrow (visual only) */}
+          <div className="absolute left-0 top-0 bottom-0 z-10 w-16 md:w-24 bg-gradient-to-r from-[var(--hero-shade)] to-transparent pointer-events-none" />
+          {/* Left arrow — bare chevron, theme-aware color */}
           <button
             onClick={() => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length)}
-            className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full flex items-center justify-center bg-[var(--arrow-bg)] hover:bg-[var(--arrow-bg-hover)] text-[var(--arrow-icon)] backdrop-blur-sm hover:scale-110 transition-all duration-300"
+            className="group absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 flex items-center justify-center text-[var(--arrow-icon)]"
             aria-label="Previous slide"
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-80 group-hover:opacity-100 group-hover:-translate-x-0.5 transition-all duration-300">
               <polyline points="15 18 9 12 15 6" />
             </svg>
           </button>
 
-          {/* Right arrow */}
+          {/* Right edge shade — full-height gradient behind the arrow (visual only) */}
+          <div className="absolute right-0 top-0 bottom-0 z-10 w-16 md:w-24 bg-gradient-to-l from-[var(--hero-shade)] to-transparent pointer-events-none" />
+          {/* Right arrow — bare chevron, theme-aware color */}
           <button
             onClick={() => setCurrentSlide((prev) => (prev + 1) % heroSlides.length)}
-            className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full flex items-center justify-center bg-[var(--arrow-bg)] hover:bg-[var(--arrow-bg-hover)] text-[var(--arrow-icon)] backdrop-blur-sm hover:scale-110 transition-all duration-300"
+            className="group absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 flex items-center justify-center text-[var(--arrow-icon)]"
             aria-label="Next slide"
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-80 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-300">
               <polyline points="9 18 15 12 9 6" />
             </svg>
           </button>
@@ -207,13 +213,13 @@ export default function Home() {
             )}
           </div>
 
-          {/* Scroll-down indicator */}
+          {/* Scroll-down indicator — original bare chevron */}
           <a
             href="#about"
-            className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 w-12 h-12 rounded-full flex items-center justify-center bg-[var(--arrow-bg)] hover:bg-[var(--arrow-bg-hover)] text-[var(--arrow-icon)] backdrop-blur-sm transition-colors animate-bounce-slow"
+            className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-1 text-white/70 hover:text-white transition-colors animate-bounce-slow"
             aria-label="Scroll down"
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="6 9 12 15 18 9" />
             </svg>
           </a>
@@ -221,34 +227,21 @@ export default function Home() {
 
         {/* 2. About / Firm */}
         <section id="about" className="reveal pt-20 pb-12 px-8">
-          <div className="max-w-5xl mx-auto">
-            <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-muted)] mb-10 text-center">About the Firm</p>
-            {about?.photo_url ? (
-              <div className="grid grid-cols-1 md:grid-cols-[minmax(0,300px)_1fr] gap-8 md:gap-12 items-center">
-                <img
-                  src={about.photo_url}
-                  alt="About"
-                  className="w-full max-w-[280px] mx-auto md:max-w-none aspect-[4/5] rounded-md object-cover"
-                />
-                <div>
-                  <h2 className="text-2xl md:text-4xl font-light leading-tight">
-                    {about?.headline || "We design spaces that inspire, transform, and endure."}
-                  </h2>
-                  <p className="mt-6 text-[var(--text-muted)] leading-relaxed">
-                    {about?.description || "Katyal Architects is a design studio led by Shubham Katyal, creating architecture and interiors that balance bold vision with refined execution."}
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <div className="max-w-3xl mx-auto text-center">
-                <h2 className="text-3xl md:text-5xl font-light leading-tight">
-                  {about?.headline || "We design spaces that inspire, transform, and endure."}
-                </h2>
-                <p className="mt-8 text-[var(--text-muted)] leading-relaxed max-w-xl mx-auto">
-                  {about?.description || "Katyal Architects is a design studio led by Shubham Katyal, creating architecture and interiors that balance bold vision with refined execution."}
-                </p>
-              </div>
+          <div className="max-w-3xl mx-auto text-center">
+            <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-muted)] mb-8">About the Firm</p>
+            {about?.photo_url && (
+              <img
+                src={about.photo_url}
+                alt="About"
+                className="w-48 md:w-56 aspect-[4/5] rounded-md object-cover mx-auto mb-8"
+              />
             )}
+            <h2 className="text-3xl md:text-5xl font-light leading-tight">
+              {about?.headline || "We design spaces that inspire, transform, and endure."}
+            </h2>
+            <p className="mt-8 text-[var(--text-muted)] leading-relaxed max-w-xl mx-auto">
+              {about?.description || "Katyal Architects is a design studio led by Shubham Katyal, creating architecture and interiors that balance bold vision with refined execution."}
+            </p>
           </div>
         </section>
 
@@ -284,7 +277,7 @@ export default function Home() {
         </section>
 
         {/* 4. Instagram Feed */}
-        <section id="instagram" className="reveal-grow py-24 px-8">
+        <section id="instagram" className="reveal-grow py-20 px-8">
           <div className="max-w-6xl mx-auto">
             <div className="flex items-center justify-between mb-12">
               <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-muted)]">@katyal_architects</p>
