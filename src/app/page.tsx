@@ -174,7 +174,6 @@ export default function Home() {
           <div className="relative z-10 w-full px-8 md:px-16 pb-12 md:pb-16 pt-32 bg-gradient-to-t from-black/80 via-black/30 to-transparent">
             {heroSlides.length > 0 && heroSlides[currentSlide] ? (
               <Link href={heroSlides[currentSlide].project_link || "#"} className="group inline-block">
-                <p className="text-[10px] uppercase tracking-[0.3em] text-white/60 mb-3">Featured Project</p>
                 <h2 className="text-3xl md:text-6xl font-light text-white tracking-wide group-hover:opacity-80 transition-opacity" style={{ fontFamily: "var(--font-display), serif" }}>
                   {heroSlides[currentSlide].project_title || ""}
                 </h2>
