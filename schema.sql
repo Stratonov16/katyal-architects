@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS hero_slides (
   image_url TEXT NOT NULL,
   project_title TEXT,
   project_link TEXT,
+  duration INTEGER DEFAULT 4,
   "order" INTEGER DEFAULT 0,
   status TEXT DEFAULT 'published',
   created_by TEXT,

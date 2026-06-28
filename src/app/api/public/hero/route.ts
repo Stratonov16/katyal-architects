@@ -9,6 +9,7 @@ export async function GET() {
        h.image_url,
        h.project_title,
        h.project_link,
+       h.duration,
        (SELECT p.location FROM projects p WHERE h.project_link LIKE '%/' || p.slug) as location
      FROM hero_slides h
      WHERE h.status = 'published'

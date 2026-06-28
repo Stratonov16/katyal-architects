@@ -9,7 +9,7 @@ export default function Home() {
   const reviewIndex = useRef(0);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [activeTeamMember, setActiveTeamMember] = useState<string | null>(null);
-  const [heroSlides, setHeroSlides] = useState<{image_url: string; project_title: string; project_link: string; location?: string}[]>([]);
+  const [heroSlides, setHeroSlides] = useState<{image_url: string; project_title: string; project_link: string; location?: string; duration?: number}[]>([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [about, setAbout] = useState<{headline: string; description: string; photo_url: string} | null>(null);
   const [reviews, setReviews] = useState<{client_name: string; project_name: string; quote: string; photo_url: string}[]>([]);
@@ -28,11 +28,14 @@ export default function Home() {
 
   useEffect(() => {
     if (heroSlides.length <= 1) return;
-    const timer = setInterval(() => {
+    // Each slide advances after its own configured duration (seconds).
+    const current = heroSlides[currentSlide];
+    const seconds = current?.duration && current.duration > 0 ? current.duration : 4;
+    const timer = setTimeout(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-    }, 4000);
-    return () => clearInterval(timer);
-  }, [heroSlides.length]);
+    }, seconds * 1000);
+    return () => clearTimeout(timer);
+  }, [heroSlides, currentSlide]);
 
   const slideReviews = useCallback((direction: number) => {
     const slider = document.querySelector(".review-slider") as HTMLElement;

@@ -43,9 +43,10 @@ export async function POST(request: NextRequest) {
 
     for (let i = 0; i < slides.length; i++) {
       const slide = slides[i];
+      const duration = Number(slide.duration) > 0 ? Number(slide.duration) : 4;
       await execute(
-        `INSERT INTO hero_slides (image_url, project_title, project_link, "order", status, created_by) VALUES (?, ?, ?, ?, 'published', ?)`,
-        [slide.imageUrl, slide.projectTitle, slide.projectLink, i, user.email]
+        `INSERT INTO hero_slides (image_url, project_title, project_link, duration, "order", status, created_by) VALUES (?, ?, ?, ?, ?, 'published', ?)`,
+        [slide.imageUrl, slide.projectTitle, slide.projectLink, duration, i, user.email]
       );
     }
 

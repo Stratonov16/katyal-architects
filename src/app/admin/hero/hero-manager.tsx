@@ -13,7 +13,15 @@ type HeroSlide = {
   projectTitle: string;
   projectLink: string;
   cropData: CropData | null;
+  duration: number; // seconds this slide stays on screen
 };
+
+const DEFAULT_IMAGE_DURATION = 4;
+const DEFAULT_VIDEO_DURATION = 8;
+
+function isVideoUrl(url: string): boolean {
+  return url.endsWith(".mp4") || url.endsWith(".webm") || url.endsWith(".mov");
+}
 
 export default function HeroManager({ userRole }: { userRole: string }) {
   const [slides, setSlides] = useState<HeroSlide[]>([]);
@@ -39,12 +47,13 @@ export default function HeroManager({ userRole }: { userRole: string }) {
         if (slidesRes.ok) {
           const data = await slidesRes.json();
           if (data.slides) {
-            const existingSlides = data.slides.map((s: { image_url: string; project_title: string; project_link: string }, i: number) => ({
+            const existingSlides = data.slides.map((s: { image_url: string; project_title: string; project_link: string; duration?: number }, i: number) => ({
               id: String(i),
               imageUrl: s.image_url,
               projectTitle: s.project_title || "",
               projectLink: s.project_link || "",
               cropData: null,
+              duration: s.duration || (isVideoUrl(s.image_url) ? DEFAULT_VIDEO_DURATION : DEFAULT_IMAGE_DURATION),
             }));
             setSlides(existingSlides);
           }
@@ -96,6 +105,7 @@ export default function HeroManager({ userRole }: { userRole: string }) {
         projectTitle: "",
         projectLink: "",
         cropData: null,
+        duration: DEFAULT_IMAGE_DURATION,
       };
       setSlides((prev) => [...prev, newSlide]);
       setCroppingSlide(newSlide.id);
@@ -120,10 +130,17 @@ export default function HeroManager({ userRole }: { userRole: string }) {
         projectTitle: "",
         projectLink: "",
         cropData: null,
+        duration: DEFAULT_IMAGE_DURATION,
       };
       setSlides((prev) => [...prev, newSlide]);
       setCroppingSlide(newSlide.id);
     }
+  };
+
+  const handleDurationChange = (id: string, duration: number) => {
+    setSlides((prev) =>
+      prev.map((s) => (s.id === id ? { ...s, duration } : s))
+    );
   };
 
   const handleCropApply = (id: string, cropData: CropData) => {
@@ -172,6 +189,7 @@ export default function HeroManager({ userRole }: { userRole: string }) {
             imageUrl: s.imageUrl,
             projectTitle: s.projectTitle,
             projectLink: s.projectLink,
+            duration: s.duration,
           })),
         }),
       });
@@ -363,6 +381,23 @@ export default function HeroManager({ userRole }: { userRole: string }) {
                     </option>
                   ))}
                 </select>
+
+                {/* Slide duration on screen */}
+                <div className="flex items-center justify-between mb-3">
+                  <label className="text-[10px] uppercase tracking-[0.1em] text-[var(--text-muted)]">
+                    {isVideoUrl(slide.imageUrl) ? "Video plays for" : "Shows for"}
+                  </label>
+                  <select
+                    value={slide.duration}
+                    onChange={(e) => handleDurationChange(slide.id, Number(e.target.value))}
+                    className="bg-transparent border border-[var(--border)] rounded py-1 px-2 text-[11px] outline-none focus:border-[var(--text)] transition-colors"
+                  >
+                    {[3, 4, 5, 6, 8, 10, 12, 15, 20, 30].map((sec) => (
+                      <option key={sec} value={sec}>{sec} seconds</option>
+                    ))}
+                  </select>
+                </div>
+
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => moveSlide(slide.id, -1)}
@@ -407,6 +442,10 @@ export default function HeroManager({ userRole }: { userRole: string }) {
       {showVideoUploader && (
         <VideoUploader
           onSelect={async (video) => {
+            // Close the modal first so the upload progress bar (which renders
+            // on the page behind it) is visible during the upload.
+            setShowVideoUploader(false);
+
             let url = "";
             if (video.type === "upload" && video.file) {
               const uploaded = await uploadImage(video.file);
@@ -421,10 +460,10 @@ export default function HeroManager({ userRole }: { userRole: string }) {
                 projectTitle: "",
                 projectLink: "",
                 cropData: null,
+                duration: isVideoUrl(url) ? DEFAULT_VIDEO_DURATION : DEFAULT_IMAGE_DURATION,
               };
               setSlides((prev) => [...prev, newSlide]);
             }
-            setShowVideoUploader(false);
           }}
           onCancel={() => setShowVideoUploader(false)}
         />
