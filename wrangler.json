@@ -17,6 +17,7 @@
     }
   ],
   "vars": {
-    "R2_PUBLIC_URL": "https://media.katyalarchitects.com"
+    "R2_PUBLIC_URL": "https://media.katyalarchitects.com",
+    "R2_BUCKET_NAME": "katyal-architects-media"
   }
 }

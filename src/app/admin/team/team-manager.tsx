@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import AdminHeader from "@/components/AdminHeader";
 import Toast from "@/components/Toast";
+import { uploadFileWithProgress } from "@/lib/upload";
 
 type TeamMember = {
   id: number;
@@ -26,6 +27,7 @@ export default function TeamManager({ userRole }: { userRole: string }) {
   const [photo, setPhoto] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -89,18 +91,19 @@ export default function TeamManager({ userRole }: { userRole: string }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setUploading(true);
+    setUploadProgress(0);
 
     let photoUrl = editing?.photo_url || "";
 
-    // Upload new photo if selected
+    // Upload new photo if selected — directly to R2
     if (photo) {
-      const formData = new FormData();
-      formData.append("file", photo);
-      formData.append("folder", "team");
-      const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
-      if (res.ok) {
-        const data = await res.json();
-        photoUrl = data.url;
+      try {
+        const result = await uploadFileWithProgress(photo, "team", (p) => setUploadProgress(p.percent));
+        photoUrl = result.url;
+      } catch (err) {
+        setToast({ message: err instanceof Error ? err.message : "Upload failed", type: "error" });
+        setUploading(false);
+        return;
       }
     }
 
@@ -205,6 +208,18 @@ export default function TeamManager({ userRole }: { userRole: string }) {
                   />
                 </div>
               </div>
+
+              {uploading && photo && (
+                <div className="pt-2">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)]">Uploading photo</p>
+                    <p className="text-[10px] tabular-nums text-[var(--text-muted)]">{uploadProgress}%</p>
+                  </div>
+                  <div className="w-full h-1.5 bg-[var(--border)] rounded-full overflow-hidden">
+                    <div className="h-full bg-[var(--text)] transition-all duration-200 ease-out" style={{ width: `${uploadProgress}%` }} />
+                  </div>
+                </div>
+              )}
 
               <div className="flex gap-3 pt-4">
                 <button

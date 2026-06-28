@@ -1,0 +1,19 @@
+# Example secrets file. Copy to `.dev.vars` for local `wrangler` dev,
+# and set the SAME keys as Secrets in the Cloudflare Pages dashboard
+# (Settings -> Variables and secrets -> Production) for the live site.
+#
+# NEVER commit real values. `.dev.vars` is gitignored; only this
+# `.dev.vars.example` is tracked.
+
+# --- Admin auth ---
+SUPER_ADMIN_EMAIL=admin@example.com
+SUPER_ADMIN_PASSWORD=change-me
+JWT_SECRET=some-long-random-string
+
+# --- Direct-to-R2 uploads ---
+# Create an R2 API token: Cloudflare dashboard -> R2 -> Manage R2 API Tokens
+# -> Create API Token -> "Object Read & Write", scoped to the
+# katyal-architects-media bucket. Then copy the values below.
+R2_ACCOUNT_ID=your-cloudflare-account-id
+R2_ACCESS_KEY_ID=your-r2-access-key-id
+R2_SECRET_ACCESS_KEY=your-r2-secret-access-key

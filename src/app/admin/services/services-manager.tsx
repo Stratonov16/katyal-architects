@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import AdminHeader from "@/components/AdminHeader";
 import Toast from "@/components/Toast";
+import { uploadFileWithProgress } from "@/lib/upload";
 
 type Service = {
   id: number;
@@ -15,6 +16,7 @@ export default function ServicesManager({ userRole }: { userRole: string }) {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [activeSlug, setActiveSlug] = useState<string | null>(null);
@@ -37,20 +39,20 @@ export default function ServicesManager({ userRole }: { userRole: string }) {
     if (!file || !activeSlug) return;
 
     setUploading(activeSlug);
+    setUploadProgress(0);
 
-    // Upload to R2
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("folder", "services");
-    const uploadRes = await fetch("/api/admin/upload", { method: "POST", body: formData });
-
-    if (!uploadRes.ok) {
-      setToast({ message: "Upload failed", type: "error" });
+    // Upload directly to R2
+    let url: string;
+    try {
+      const result = await uploadFileWithProgress(file, "services", (p) => setUploadProgress(p.percent));
+      url = result.url;
+    } catch (err) {
+      setToast({ message: err instanceof Error ? err.message : "Upload failed", type: "error" });
       setUploading(null);
+      setActiveSlug(null);
+      e.target.value = "";
       return;
     }
-
-    const { url } = await uploadRes.json();
 
     // Save to DB
     const res = await fetch("/api/admin/services", {
@@ -110,7 +112,12 @@ export default function ServicesManager({ userRole }: { userRole: string }) {
               )}
               <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-colors duration-300 flex items-center justify-center">
                 {uploading === service.slug ? (
-                  <p className="text-[10px] text-white animate-pulse">Uploading...</p>
+                  <div className="w-3/4">
+                    <p className="text-[10px] text-white text-center mb-1.5 tabular-nums">Uploading {uploadProgress}%</p>
+                    <div className="w-full h-1 bg-white/30 rounded-full overflow-hidden">
+                      <div className="h-full bg-white transition-all duration-200 ease-out" style={{ width: `${uploadProgress}%` }} />
+                    </div>
+                  </div>
                 ) : (
                   <div className="text-center">
                     <p className="text-xs uppercase tracking-[0.2em] text-white">{service.name}</p>

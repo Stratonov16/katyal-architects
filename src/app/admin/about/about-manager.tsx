@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import AdminHeader from "@/components/AdminHeader";
 import Toast from "@/components/Toast";
+import { uploadFileWithProgress } from "@/lib/upload";
 
 export default function AboutManager({ userRole }: { userRole: string }) {
   const [headline, setHeadline] = useState("");
@@ -12,6 +13,7 @@ export default function AboutManager({ userRole }: { userRole: string }) {
   const [photoPreview, setPhotoPreview] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -33,17 +35,18 @@ export default function AboutManager({ userRole }: { userRole: string }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
+    setUploadProgress(0);
 
     let finalPhotoUrl = photoUrl;
 
     if (photo) {
-      const formData = new FormData();
-      formData.append("file", photo);
-      formData.append("folder", "about");
-      const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
-      if (res.ok) {
-        const data = await res.json();
-        finalPhotoUrl = data.url;
+      try {
+        const result = await uploadFileWithProgress(photo, "about", (p) => setUploadProgress(p.percent));
+        finalPhotoUrl = result.url;
+      } catch (err) {
+        setToast({ message: err instanceof Error ? err.message : "Upload failed", type: "error" });
+        setSaving(false);
+        return;
       }
     }
 
@@ -129,6 +132,18 @@ export default function AboutManager({ userRole }: { userRole: string }) {
             rows={5}
             className="w-full bg-transparent border border-[var(--border)] rounded-md p-3 text-sm outline-none focus:border-[var(--text)] transition-colors resize-none"
           />
+
+          {saving && photo && (
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)]">Uploading photo</p>
+                <p className="text-[10px] tabular-nums text-[var(--text-muted)]">{uploadProgress}%</p>
+              </div>
+              <div className="w-full h-1.5 bg-[var(--border)] rounded-full overflow-hidden">
+                <div className="h-full bg-[var(--text)] transition-all duration-200 ease-out" style={{ width: `${uploadProgress}%` }} />
+              </div>
+            </div>
+          )}
 
           <button
             type="submit"
