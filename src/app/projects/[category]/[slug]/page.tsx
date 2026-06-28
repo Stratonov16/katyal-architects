@@ -79,7 +79,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ catego
   return (
     <>
       <Navbar />
-      <main className="min-h-screen">
+      <main className="min-h-screen pt-14">
         {/* Hero image — full width, no text overlay */}
         <div className="w-full h-[60vh] md:h-[75vh]">
           {featuredImage ? (

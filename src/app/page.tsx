@@ -108,7 +108,7 @@ export default function Home() {
 
       <main className="" ref={sectionsRef}>
         {/* 1. Hero — Auto-rotating Project Carousel */}
-        <section className="relative min-h-screen flex items-end overflow-hidden">
+        <section className="relative min-h-[calc(100vh-3.5rem)] mt-14 flex items-end overflow-hidden">
           {/* Background media from D1/R2 */}
           {heroSlides.length > 0 ? (
             heroSlides.map((slide, i) => {
