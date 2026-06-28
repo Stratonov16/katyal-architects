@@ -30,6 +30,16 @@ type ProjectImage = {
   is_featured: number;
 };
 
+export async function generateMetadata({ params }: { params: Promise<{ category: string; slug: string }> }) {
+  const { slug } = await params;
+  const project = await queryOne<Project>(`SELECT * FROM projects WHERE slug = ? AND status = 'published'`, [slug]);
+  if (!project) return { title: "Project" };
+  return {
+    title: project.title,
+    description: project.description?.slice(0, 160) || `${project.title} — a ${project.category} project by Katyal Architects in ${project.location}.`,
+  };
+}
+
 export default async function ProjectPage({ params }: { params: Promise<{ category: string; slug: string }> }) {
   const { category, slug } = await params;
 

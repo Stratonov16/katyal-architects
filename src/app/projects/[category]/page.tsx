@@ -23,6 +23,16 @@ type Project = {
   featured_image?: string;
 };
 
+export async function generateMetadata({ params }: { params: Promise<{ category: string }> }) {
+  const { category } = await params;
+  const info = categories.find((c) => c.slug === category);
+  const name = info?.name || category;
+  return {
+    title: `${name} Projects`,
+    description: `Explore ${name.toLowerCase()} architecture and interior design projects by Katyal Architects in Hanumangarh, Rajasthan.`,
+  };
+}
+
 export default async function CategoryPage({ params }: { params: Promise<{ category: string }> }) {
   const { category } = await params;
   const categoryInfo = categories.find((c) => c.slug === category);
