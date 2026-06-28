@@ -160,11 +160,11 @@ export default function Home() {
           {/* Left arrow — bare chevron, theme-aware color */}
           <button
             onClick={() => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length)}
-            className="group absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 flex items-center justify-center text-[var(--arrow-icon)]"
+            className="group absolute left-0 md:left-1 top-1/2 -translate-y-1/2 z-20 w-10 h-20 flex items-center justify-center text-[var(--arrow-icon)]"
             aria-label="Previous slide"
           >
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-80 group-hover:opacity-100 group-hover:-translate-x-0.5 transition-all duration-300">
-              <polyline points="15 18 9 12 15 6" />
+            <svg width="40" height="56" viewBox="0 0 24 32" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-80 group-hover:opacity-100 group-hover:-translate-x-0.5 transition-all duration-300">
+              <polyline points="16 24 8 16 16 8" />
             </svg>
           </button>
 
@@ -173,11 +173,11 @@ export default function Home() {
           {/* Right arrow — bare chevron, theme-aware color */}
           <button
             onClick={() => setCurrentSlide((prev) => (prev + 1) % heroSlides.length)}
-            className="group absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 flex items-center justify-center text-[var(--arrow-icon)]"
+            className="group absolute right-0 md:right-1 top-1/2 -translate-y-1/2 z-20 w-10 h-20 flex items-center justify-center text-[var(--arrow-icon)]"
             aria-label="Next slide"
           >
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-80 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-300">
-              <polyline points="9 18 15 12 9 6" />
+            <svg width="40" height="56" viewBox="0 0 24 32" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-80 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-300">
+              <polyline points="8 24 16 16 8 8" />
             </svg>
           </button>
 

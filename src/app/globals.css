@@ -14,7 +14,7 @@
   --follow-text: #a78bfa;
   --review-border: #c9a84c;
   /* Hero edge shades + arrow icon (sit over images) */
-  --hero-shade: rgba(0, 0, 0, 0.7);
+  --hero-shade: rgba(0, 0, 0, 0.3);
   --arrow-icon: #ffffff;
   /* Contact CTA — dark mode: golden text, faint golden hover */
   --contact-bg: transparent;
@@ -31,7 +31,7 @@
   --follow-text: #5b4a9e;
   --review-border: #1a1a1a;
   /* Hero edge shades + arrow icon (sit over images) */
-  --hero-shade: rgba(255, 255, 255, 0.7);
+  --hero-shade: rgba(255, 255, 255, 0.35);
   --arrow-icon: #0a0a0a;
   /* Contact CTA — light mode: filled golden button (AWS-style) */
   --contact-bg: #e9a93c;
