@@ -138,7 +138,7 @@ export default function Navbar() {
                 </div>
               )}
             </div>
-            <a href="#careers" onClick={() => setMenuOpen(false)} className="hover:opacity-60 transition-opacity">CAREERS</a>
+            <a href="/careers" onClick={() => setMenuOpen(false)} className="hover:opacity-60 transition-opacity">CAREERS</a>
             <a href="#contact" onClick={() => setMenuOpen(false)} className="hover:opacity-60 transition-opacity">CONTACT US</a>
             <a href="/admin" onClick={() => setMenuOpen(false)} className="hover:opacity-60 transition-opacity text-[var(--text-muted)]">ADMIN</a>
           </div>
