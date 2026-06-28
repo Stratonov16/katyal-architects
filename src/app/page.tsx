@@ -373,7 +373,7 @@ export default function Home() {
         <footer className="px-8 py-16 bg-[#0a0a0a] text-[#f5f5f5]">
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
             <div>
-              <img src="https://pub-79d22fbf37e444a896d6acc795f2444b.r2.dev/static/logo/logo.jpg" alt="Katyal Architects" className="w-10 h-10 object-cover rounded-full" />
+              <img src="https://media.katyalarchitects.com/static/logo/logo.jpg" alt="Katyal Architects" className="w-10 h-10 object-cover rounded-full" />
               <p className="mt-2 text-sm text-[#a3a3a3] italic">Driven by Vision, Defined by Impact.</p>
             </div>
             <div className="text-sm text-[#a3a3a3]">

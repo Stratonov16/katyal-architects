@@ -15,7 +15,7 @@ const outfit = Outfit({
 });
 
 const SITE_URL = "https://katyalarchitects.com";
-const LOGO_URL = "https://pub-79d22fbf37e444a896d6acc795f2444b.r2.dev/static/logo/logo.jpg";
+const LOGO_URL = "https://media.katyalarchitects.com/static/logo/logo.jpg";
 
 export const metadata: Metadata = {
   title: {

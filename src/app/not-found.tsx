@@ -8,7 +8,7 @@ export default function NotFound() {
       <div className="flex flex-col items-center justify-center min-h-screen px-6">
         {/* Oreo's photo */}
         <img
-          src="https://pub-79d22fbf37e444a896d6acc795f2444b.r2.dev/static/oreo/WhatsApp%20Image%202026-06-15%20at%201.39.13%20AM.jpeg"
+          src="https://media.katyalarchitects.com/static/oreo/WhatsApp%20Image%202026-06-15%20at%201.39.13%20AM.jpeg"
           alt="Oreo"
           className="w-48 h-48 rounded-full object-cover mb-8"
         />

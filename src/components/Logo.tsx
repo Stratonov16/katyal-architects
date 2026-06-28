@@ -1,4 +1,4 @@
-const LOGO_URL = "https://pub-79d22fbf37e444a896d6acc795f2444b.r2.dev/static/logo/logo.jpg";
+const LOGO_URL = "https://media.katyalarchitects.com/static/logo/logo.jpg";
 
 export default function Logo({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
   const sizeClasses = {
