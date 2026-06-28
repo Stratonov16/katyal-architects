@@ -2,7 +2,8 @@ export const runtime = "edge";
 
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import { query, execute } from "@/lib/db";
+import { query, queryOne, execute } from "@/lib/db";
+import { deleteByUrl } from "@/lib/r2";
 
 export async function GET() {
   const user = await getCurrentUser();
@@ -68,6 +69,8 @@ export async function DELETE(request: NextRequest) {
   if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
 
   if (user.role === "super_admin") {
+    const review = await queryOne<{ photo_url: string }>(`SELECT photo_url FROM reviews WHERE id=?`, [id]);
+    if (review?.photo_url) await deleteByUrl(review.photo_url);
     await execute(`DELETE FROM reviews WHERE id=?`, [id]);
     return NextResponse.json({ success: true, message: "Deleted" });
   } else {

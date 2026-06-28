@@ -2,7 +2,8 @@ export const runtime = "edge";
 
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import { query, execute } from "@/lib/db";
+import { query, queryOne, execute } from "@/lib/db";
+import { deleteByUrl } from "@/lib/r2";
 
 // GET — list all team members
 export async function GET() {
@@ -75,6 +76,8 @@ export async function DELETE(request: NextRequest) {
   if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
 
   if (user.role === "super_admin") {
+    const member = await queryOne<{ photo_url: string }>(`SELECT photo_url FROM team WHERE id=?`, [id]);
+    if (member?.photo_url) await deleteByUrl(member.photo_url);
     await execute(`DELETE FROM team WHERE id=?`, [id]);
     return NextResponse.json({ success: true, message: "Deleted" });
   } else {

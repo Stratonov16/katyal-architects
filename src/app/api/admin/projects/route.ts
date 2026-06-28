@@ -3,6 +3,7 @@ export const runtime = "edge";
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { query, execute } from "@/lib/db";
+import { deleteByUrl } from "@/lib/r2";
 
 // GET — list all projects OR get images for a specific project
 export async function GET(request: NextRequest) {
@@ -88,9 +89,11 @@ export async function PUT(request: NextRequest) {
       [title, slug, category, description || "", location || "", year || 2026, video_url || "", id]
     );
 
-    // Delete removed images
+    // Delete removed images (from R2 + DB)
     if (deletedImageIds && deletedImageIds.length > 0) {
       for (const imgId of deletedImageIds) {
+        const img = await query<{ image_url: string }>(`SELECT image_url FROM project_images WHERE id=? AND project_id=?`, [imgId, id]);
+        if (img[0]?.image_url) await deleteByUrl(img[0].image_url);
         await execute(`DELETE FROM project_images WHERE id=? AND project_id=?`, [imgId, id]);
       }
     }
@@ -137,6 +140,11 @@ export async function DELETE(request: NextRequest) {
   if (!id) return NextResponse.json({ error: "Project ID required" }, { status: 400 });
 
   if (user.role === "super_admin") {
+    // Delete all image files from R2 first
+    const images = await query<{ image_url: string }>(`SELECT image_url FROM project_images WHERE project_id=?`, [id]);
+    for (const img of images) {
+      if (img.image_url) await deleteByUrl(img.image_url);
+    }
     await execute(`DELETE FROM project_images WHERE project_id=?`, [id]);
     await execute(`DELETE FROM projects WHERE id=?`, [id]);
     return NextResponse.json({ success: true, message: "Deleted" });

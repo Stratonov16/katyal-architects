@@ -2,6 +2,7 @@ export const runtime = "edge";
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { query, execute } from "@/lib/db";
+import { deleteByUrl } from "@/lib/r2";
 
 
 // GET — fetch all hero slides
@@ -28,6 +29,15 @@ export async function POST(request: NextRequest) {
   const { slides } = await request.json();
 
   if (user.role === "super_admin") {
+    // Find old images no longer used in the new slide set → delete from R2
+    const oldSlides = await query<{ image_url: string }>(`SELECT image_url FROM hero_slides`);
+    const newUrls = new Set(slides.map((s: { imageUrl: string }) => s.imageUrl));
+    for (const old of oldSlides) {
+      if (old.image_url && !newUrls.has(old.image_url)) {
+        await deleteByUrl(old.image_url);
+      }
+    }
+
     // Delete existing and insert new
     await execute(`DELETE FROM hero_slides`);
 

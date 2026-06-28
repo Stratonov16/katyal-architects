@@ -2,7 +2,8 @@ export const runtime = "edge";
 
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import { query, execute } from "@/lib/db";
+import { query, queryOne, execute } from "@/lib/db";
+import { deleteByUrl } from "@/lib/r2";
 
 export async function GET() {
   const user = await getCurrentUser();
@@ -18,6 +19,12 @@ export async function POST(request: NextRequest) {
 
   const { slug, image_url } = await request.json();
   if (!slug || !image_url) return NextResponse.json({ error: "Slug and image required" }, { status: 400 });
+
+  // Delete the old cover image from R2 if it's being replaced
+  const existing = await queryOne<{ image_url: string }>(`SELECT image_url FROM services WHERE slug=?`, [slug]);
+  if (existing?.image_url && existing.image_url !== image_url) {
+    await deleteByUrl(existing.image_url);
+  }
 
   await execute(
     `UPDATE services SET image_url=?, updated_by=?, updated_at=datetime('now') WHERE slug=?`,

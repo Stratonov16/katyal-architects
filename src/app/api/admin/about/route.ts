@@ -3,6 +3,7 @@ export const runtime = "edge";
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { queryOne, execute } from "@/lib/db";
+import { deleteByUrl } from "@/lib/r2";
 
 export async function GET() {
   const user = await getCurrentUser();
@@ -19,8 +20,12 @@ export async function POST(request: NextRequest) {
   const { headline, description, photo_url } = await request.json();
 
   if (user.role === "super_admin") {
-    const existing = await queryOne(`SELECT id FROM about LIMIT 1`);
+    const existing = await queryOne<{ id: number; photo_url: string }>(`SELECT id, photo_url FROM about LIMIT 1`);
     if (existing) {
+      // Delete old photo if replaced
+      if (existing.photo_url && photo_url && existing.photo_url !== photo_url) {
+        await deleteByUrl(existing.photo_url);
+      }
       await execute(
         `UPDATE about SET headline=?, description=?, photo_url=?, status='published', updated_by=?, updated_at=datetime('now') WHERE id=1`,
         [headline || "", description || "", photo_url || "", user.email]
