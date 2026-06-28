@@ -156,9 +156,10 @@ export default function Home() {
           {/* Left arrow */}
           <button
             onClick={() => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length)}
-            className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 flex items-center justify-center text-white/70 hover:text-white hover:scale-110 transition-all duration-300"
+            className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full flex items-center justify-center bg-[var(--arrow-bg)] hover:bg-[var(--arrow-bg-hover)] text-[var(--arrow-icon)] backdrop-blur-sm hover:scale-110 transition-all duration-300"
+            aria-label="Previous slide"
           >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="15 18 9 12 15 6" />
             </svg>
           </button>
@@ -166,9 +167,10 @@ export default function Home() {
           {/* Right arrow */}
           <button
             onClick={() => setCurrentSlide((prev) => (prev + 1) % heroSlides.length)}
-            className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 flex items-center justify-center text-white/70 hover:text-white hover:scale-110 transition-all duration-300"
+            className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full flex items-center justify-center bg-[var(--arrow-bg)] hover:bg-[var(--arrow-bg-hover)] text-[var(--arrow-icon)] backdrop-blur-sm hover:scale-110 transition-all duration-300"
+            aria-label="Next slide"
           >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="9 18 15 12 9 6" />
             </svg>
           </button>
@@ -208,10 +210,10 @@ export default function Home() {
           {/* Scroll-down indicator */}
           <a
             href="#about"
-            className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-1 text-white/70 hover:text-white transition-colors animate-bounce-slow"
+            className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 w-12 h-12 rounded-full flex items-center justify-center bg-[var(--arrow-bg)] hover:bg-[var(--arrow-bg-hover)] text-[var(--arrow-icon)] backdrop-blur-sm transition-colors animate-bounce-slow"
             aria-label="Scroll down"
           >
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="6 9 12 15 18 9" />
             </svg>
           </a>
