@@ -246,19 +246,19 @@ export default function Home() {
 
         {/* 2. About / Firm */}
         <section id="about" className="reveal pt-20 pb-12 px-8">
-          <div className="max-w-3xl mx-auto text-center">
+          <div className="max-w-4xl mx-auto text-center">
             <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-muted)] mb-8">About the Firm</p>
             {about?.photo_url && (
               <img
                 src={about.photo_url}
                 alt="About"
-                className="max-w-md md:max-w-xl w-full h-auto rounded-md mx-auto mb-8"
+                className="max-w-lg md:max-w-2xl w-full h-auto rounded-md mx-auto mb-8"
               />
             )}
             <h2 className="text-3xl md:text-5xl font-light leading-tight">
               {about?.headline || "We design spaces that inspire, transform, and endure."}
             </h2>
-            <p className="mt-8 text-[var(--text-muted)] leading-relaxed max-w-xl mx-auto whitespace-pre-line">
+            <p className="mt-8 text-[var(--text-muted)] leading-relaxed max-w-2xl mx-auto whitespace-pre-line">
               {about?.description || "Katyal Architects is a design studio led by Shubham Katyal, creating architecture and interiors that balance bold vision with refined execution."}
             </p>
           </div>
