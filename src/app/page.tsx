@@ -113,6 +113,11 @@ export default function Home() {
       <div className="scroll-progress" style={{ width: `${scrollProgress}%` }} />
 
       <main className="" ref={sectionsRef}>
+        {/* SEO h1 — crawlable by Google, visually hidden so it doesn't disturb
+            the hero design. Carries the firm's primary search terms. */}
+        <h1 className="sr-only">
+          Katyal Architects — Best Architects &amp; Interior Designers in Hanumangarh, Rajasthan
+        </h1>
         {/* 1. Hero — Auto-rotating Project Carousel.
             Mobile: full-height, image runs under the floating burger/toggle.
             Desktop: sits below the solid 3.5rem nav bar. */}
