@@ -4,14 +4,14 @@ import { useEffect, useState } from "react";
 
 const LOGO_URL = "https://media.katyalarchitects.com/static/logo/logo.jpg";
 
-// Branded intro loader. Shows for ~1.5s on first homepage load, then fades out.
-export default function Loader() {
+// Branded intro loader. Shows for `duration` ms, then fades out over 600ms.
+export default function Loader({ duration = 1500 }: { duration?: number }) {
   const [hidden, setHidden] = useState(false);   // start fade-out
   const [removed, setRemoved] = useState(false);  // unmount after fade
 
   useEffect(() => {
-    const fadeTimer = setTimeout(() => setHidden(true), 1500);
-    const removeTimer = setTimeout(() => setRemoved(true), 2100); // 1500 + 600 fade
+    const fadeTimer = setTimeout(() => setHidden(true), duration);
+    const removeTimer = setTimeout(() => setRemoved(true), duration + 600); // + fade
     // Lock scroll while the loader is up
     document.body.style.overflow = "hidden";
     return () => {
@@ -19,7 +19,7 @@ export default function Loader() {
       clearTimeout(removeTimer);
       document.body.style.overflow = "";
     };
-  }, []);
+  }, [duration]);
 
   useEffect(() => {
     if (hidden) document.body.style.overflow = "";

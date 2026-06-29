@@ -4,6 +4,7 @@ import Link from "next/link";
 import { query, queryOne } from "@/lib/db";
 import Navbar from "@/components/Navbar";
 import GallerySection from "@/components/GallerySection";
+import Loader from "@/components/Loader";
 
 const categories = [
   { name: "Residential", slug: "residential" },
@@ -78,6 +79,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ catego
 
   return (
     <>
+      <Loader duration={2000} />
       <Navbar />
       <main className="min-h-screen pt-14">
         {/* Hero image — full width, no text overlay */}
