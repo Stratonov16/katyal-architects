@@ -44,7 +44,7 @@ export default function Navbar() {
         {/* Nav links — center (desktop only) */}
         <div className="hidden md:flex items-center gap-8 text-xs uppercase tracking-[0.15em] font-normal" style={{ fontFamily: "var(--font-body), sans-serif" }}>
           <a href="/" className="hover:opacity-60 transition-opacity">HOME</a>
-          <a href="#about" className="hover:opacity-60 transition-opacity">ABOUT</a>
+          <a href="/#about" className="hover:opacity-60 transition-opacity">ABOUT</a>
           <div className="relative">
             <button
               onClick={() => { setServicesOpen(!servicesOpen); setConnectOpen(false); }}
@@ -86,7 +86,7 @@ export default function Navbar() {
                   LINKEDIN
                 </a>
                 <hr className="border-[var(--border)]" />
-                <a href="#contact" className="flex items-center gap-2 text-[10px] uppercase tracking-[0.1em] hover:opacity-60 transition-opacity font-normal">
+                <a href="/#contact" className="flex items-center gap-2 text-[10px] uppercase tracking-[0.1em] hover:opacity-60 transition-opacity font-normal">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
                   GET QUOTE
                 </a>
@@ -124,7 +124,7 @@ export default function Navbar() {
           {/* Menu links */}
           <div className="flex flex-col gap-6 text-xs uppercase tracking-[0.2em] font-normal" style={{ fontFamily: "var(--font-body), sans-serif" }}>
             <a href="/" onClick={() => setMenuOpen(false)} className="hover:opacity-60 transition-opacity">HOME</a>
-            <a href="#about" onClick={() => setMenuOpen(false)} className="hover:opacity-60 transition-opacity">ABOUT</a>
+            <a href="/#about" onClick={() => setMenuOpen(false)} className="hover:opacity-60 transition-opacity">ABOUT</a>
             <div>
               <button onClick={() => setMobileServicesOpen(!mobileServicesOpen)} className="hover:opacity-60 transition-opacity">SERVICES</button>
               {mobileServicesOpen && (
@@ -139,7 +139,7 @@ export default function Navbar() {
               )}
             </div>
             <a href="/careers" onClick={() => setMenuOpen(false)} className="hover:opacity-60 transition-opacity">CAREERS</a>
-            <a href="#contact" onClick={() => setMenuOpen(false)} className="hover:opacity-60 transition-opacity">CONTACT US</a>
+            <a href="/#contact" onClick={() => setMenuOpen(false)} className="hover:opacity-60 transition-opacity">CONTACT US</a>
             <a href="/admin" onClick={() => setMenuOpen(false)} className="hover:opacity-60 transition-opacity text-[var(--text-muted)]">ADMIN</a>
           </div>
 
