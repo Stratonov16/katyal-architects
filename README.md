@@ -8,9 +8,7 @@ A custom-built portfolio website and content management system for **Katyal Arch
 
 ## Demo
 
-https://media.katyalarchitects.com/static/site/WhatsApp%20Video%202026-06-29%20at%209.11.27%20AM.mp4
-
-> If the video doesn't play inline, [watch it here](https://media.katyalarchitects.com/static/site/WhatsApp%20Video%202026-06-29%20at%209.11.27%20AM.mp4).
+Watch it [here](https://media.katyalarchitects.com/static/site/WhatsApp%20Video%202026-06-29%20at%209.11.27%20AM.mp4)
 
 ---
 
