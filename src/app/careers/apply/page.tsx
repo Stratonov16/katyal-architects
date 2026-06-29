@@ -69,7 +69,7 @@ function ApplyForm() {
         <Navbar />
         <div className="flex flex-col items-center justify-center min-h-screen px-6 text-center">
           {/* Golden check */}
-          <div className="w-16 h-16 rounded-full flex items-center justify-center mb-6 bg-[var(--review-accent)]/10 text-[var(--review-accent)] career-rise">
+          <div className="w-16 h-16 rounded-full flex items-center justify-center mb-6 bg-[var(--career-accent)]/10 text-[var(--career-accent)] career-rise">
             <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M20 6L9 17l-5-5" />
             </svg>
@@ -94,14 +94,14 @@ function ApplyForm() {
       <div className="relative overflow-hidden">
         {/* Soft golden glow */}
         <div className="pointer-events-none absolute top-0 inset-x-0 -z-10 flex justify-center">
-          <div className="w-[50vw] h-[50vw] max-w-[500px] max-h-[500px] rounded-full bg-[var(--review-accent)] opacity-[0.06] blur-[120px]" />
+          <div className="w-[50vw] h-[50vw] max-w-[500px] max-h-[500px] rounded-full bg-[var(--career-accent)] opacity-[0.06] blur-[120px]" />
         </div>
 
         <div className="max-w-lg mx-auto px-8 pt-28 pb-20">
           <a href="/careers" className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] hover:text-[var(--text)] transition-colors career-rise">
             ← Back to Careers
           </a>
-          <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--review-accent)] mt-6 mb-2 career-rise" style={{ animationDelay: "0.05s" }}>
+          <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--career-accent)] mt-6 mb-2 career-rise" style={{ animationDelay: "0.05s" }}>
             Application
           </p>
           <h1 className="text-3xl md:text-4xl font-light mb-1 career-rise" style={{ fontFamily: "var(--font-display), serif", animationDelay: "0.1s" }}>
@@ -116,7 +116,7 @@ function ApplyForm() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              className="w-full bg-transparent border-b border-[var(--border)] py-3 text-sm outline-none focus:border-[var(--review-accent)] transition-colors"
+              className="w-full bg-transparent border-b border-[var(--border)] py-3 text-sm outline-none focus:border-[var(--career-accent)] transition-colors"
             />
             <input
               type="email"
@@ -124,9 +124,9 @@ function ApplyForm() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full bg-transparent border-b border-[var(--border)] py-3 text-sm outline-none focus:border-[var(--review-accent)] transition-colors"
+              className="w-full bg-transparent border-b border-[var(--border)] py-3 text-sm outline-none focus:border-[var(--career-accent)] transition-colors"
             />
-            <div className="flex items-center border-b border-[var(--border)] focus-within:border-[var(--review-accent)] transition-colors">
+            <div className="flex items-center border-b border-[var(--border)] focus-within:border-[var(--career-accent)] transition-colors">
               <span className="text-sm text-[var(--text-muted)] pr-2">+91</span>
               <input
                 type="tel"
@@ -143,14 +143,14 @@ function ApplyForm() {
               value={coverLetter}
               onChange={(e) => setCoverLetter(e.target.value)}
               rows={4}
-              className="w-full bg-transparent border border-[var(--border)] rounded-md p-3 text-sm outline-none focus:border-[var(--review-accent)] transition-colors resize-none"
+              className="w-full bg-transparent border border-[var(--border)] rounded-md p-3 text-sm outline-none focus:border-[var(--career-accent)] transition-colors resize-none"
             />
 
             {/* Resume upload */}
-            <label className="block border border-dashed border-[var(--border)] rounded-md p-5 cursor-pointer hover:border-[var(--review-accent)] transition-colors">
+            <label className="block border border-dashed border-[var(--border)] rounded-md p-5 cursor-pointer hover:border-[var(--career-accent)] transition-colors">
               <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-2">Resume / Portfolio (PDF, max 20MB)</p>
               <div className="flex items-center gap-3 text-sm">
-                <span className="text-[var(--review-accent)]">
+                <span className="text-[var(--career-accent)]">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
                 </span>
                 <span className={resume ? "text-[var(--text)]" : "text-[var(--text-muted)]"}>
@@ -172,7 +172,7 @@ function ApplyForm() {
                   <p className="text-[10px] tabular-nums text-[var(--text-muted)]">{uploadProgress}%</p>
                 </div>
                 <div className="w-full h-1.5 bg-[var(--border)] rounded-full overflow-hidden">
-                  <div className="h-full bg-[var(--review-accent)] transition-all duration-200 ease-out" style={{ width: `${uploadProgress}%` }} />
+                  <div className="h-full bg-[var(--career-accent)] transition-all duration-200 ease-out" style={{ width: `${uploadProgress}%` }} />
                 </div>
               </div>
             )}
