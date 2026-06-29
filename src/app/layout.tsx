@@ -19,7 +19,7 @@ const LOGO_URL = "https://media.katyalarchitects.com/static/logo/logo.jpg";
 
 export const metadata: Metadata = {
   title: {
-    default: "Katyal Architects | Driven by Vision, Defined by Impact",
+    default: "Katyal Architects | Best Architects & Interior Designers in Hanumangarh, Rajasthan",
     template: "%s | Katyal Architects",
   },
   description: "Katyal Architects is a design studio led by Shubham Katyal, creating architecture and interiors that balance bold vision with refined execution. Services: Residential, Hospitality, Interiors, Landscape, Commercial, Township.",
