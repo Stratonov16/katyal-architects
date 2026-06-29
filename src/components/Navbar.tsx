@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import ThemeToggle from "./ThemeToggle";
 import Logo from "./Logo";
 
-export default function Navbar() {
+export default function Navbar({ heroOverlay = false }: { heroOverlay?: boolean }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
   const [connectOpen, setConnectOpen] = useState(false);
@@ -24,16 +24,16 @@ export default function Navbar() {
 
   return (
     <>
-      <nav ref={navRef} className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 md:px-8 h-14 bg-[var(--bg)] border-b border-[var(--border)]">
+      <nav ref={navRef} className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 md:px-8 h-14 ${heroOverlay ? "bg-transparent md:bg-[var(--bg)] border-b border-transparent md:border-[var(--border)]" : "bg-[var(--bg)] border-b border-[var(--border)]"}`}>
         {/* Hamburger — left (mobile) */}
         <button
-          className="md:hidden flex flex-col gap-[4px] w-5"
+          className={`md:hidden flex flex-col gap-[4px] w-5 ${heroOverlay ? "[filter:drop-shadow(0_1px_2px_rgba(0,0,0,0.6))]" : ""}`}
           onClick={() => setMenuOpen(true)}
           aria-label="Open menu"
         >
-          <span className="w-full h-[1.5px] bg-[var(--text)]" />
-          <span className="w-full h-[1.5px] bg-[var(--text)]" />
-          <span className="w-full h-[1.5px] bg-[var(--text)]" />
+          <span className={`w-full h-[1.5px] ${heroOverlay ? "bg-white" : "bg-[var(--text)]"}`} />
+          <span className={`w-full h-[1.5px] ${heroOverlay ? "bg-white" : "bg-[var(--text)]"}`} />
+          <span className={`w-full h-[1.5px] ${heroOverlay ? "bg-white" : "bg-[var(--text)]"}`} />
         </button>
 
         {/* Logo — left (desktop) */}
@@ -95,8 +95,11 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Theme toggle — right */}
-        <ThemeToggle />
+        {/* Theme toggle — right. Over the hero on mobile it goes white; on
+            desktop (solid bar) and elsewhere it follows the theme text color. */}
+        <span className={heroOverlay ? "text-white md:text-[var(--text)] [filter:drop-shadow(0_1px_2px_rgba(0,0,0,0.6))] md:[filter:none]" : ""}>
+          <ThemeToggle />
+        </span>
       </nav>
 
       {/* Mobile overlay — slides from left */}

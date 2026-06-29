@@ -107,14 +107,16 @@ export default function Home() {
   return (
     <>
       <Loader />
-      <Navbar />
+      <Navbar heroOverlay />
 
       {/* Scroll progress bar */}
       <div className="scroll-progress" style={{ width: `${scrollProgress}%` }} />
 
       <main className="" ref={sectionsRef}>
-        {/* 1. Hero — Auto-rotating Project Carousel */}
-        <section className="relative min-h-[calc(100vh-3.5rem)] mt-14 flex items-end overflow-hidden">
+        {/* 1. Hero — Auto-rotating Project Carousel.
+            Mobile: full-height, image runs under the floating burger/toggle.
+            Desktop: sits below the solid 3.5rem nav bar. */}
+        <section className="relative min-h-screen md:min-h-[calc(100vh-3.5rem)] md:mt-14 flex items-end overflow-hidden">
           {/* Background media from D1/R2 */}
           {heroSlides.length > 0 ? (
             heroSlides.map((slide, i) => {
