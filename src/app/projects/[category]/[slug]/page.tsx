@@ -151,18 +151,30 @@ export default async function ProjectPage({ params }: { params: Promise<{ catego
         {/* Video */}
         {project.video_url && (
           <div className="max-w-6xl mx-auto px-8 pb-12">
-            <div className="aspect-video w-full max-w-4xl mx-auto rounded-md overflow-hidden">
-              {project.video_url.endsWith(".mp4") || project.video_url.endsWith(".webm") ? (
-                <video src={project.video_url} className="w-full h-full object-cover" controls />
-              ) : (
+            {project.video_url.includes("instagram.com") ? (
+              <div className="aspect-[9/12] w-full max-w-[400px] mx-auto rounded-md overflow-hidden bg-black">
                 <iframe
-                  src={project.video_url.replace("watch?v=", "embed/")}
+                  src={project.video_url}
                   className="w-full h-full"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allow="autoplay; clipboard-write; encrypted-media; picture-in-picture"
                   allowFullScreen
+                  scrolling="no"
                 />
-              )}
-            </div>
+              </div>
+            ) : (
+              <div className="aspect-video w-full max-w-4xl mx-auto rounded-md overflow-hidden">
+                {project.video_url.endsWith(".mp4") || project.video_url.endsWith(".webm") ? (
+                  <video src={project.video_url} className="w-full h-full object-cover" controls />
+                ) : (
+                  <iframe
+                    src={project.video_url.replace("watch?v=", "embed/")}
+                    className="w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                )}
+              </div>
+            )}
           </div>
         )}
 

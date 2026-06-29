@@ -3,16 +3,19 @@
 import { useState, useRef } from "react";
 
 type VideoData = {
-  type: "upload" | "youtube";
+  type: "upload" | "youtube" | "instagram";
   file?: File;
   localUrl?: string;
   youtubeUrl?: string;
   youtubeId?: string;
+  instagramUrl?: string;
+  instagramEmbedUrl?: string;
 };
 
 type VideoUploaderProps = {
   onSelect: (video: VideoData) => void;
   onCancel: () => void;
+  allowInstagram?: boolean;
 };
 
 const MAX_SIZE_MB = 200;
@@ -31,10 +34,19 @@ function extractYoutubeId(url: string): string | null {
   return null;
 }
 
-export default function VideoUploader({ onSelect, onCancel }: VideoUploaderProps) {
-  const [mode, setMode] = useState<"choice" | "upload" | "youtube">("choice");
+// Turn an Instagram post/reel URL into its embeddable iframe URL.
+function extractInstagramEmbed(url: string): string | null {
+  const match = url.match(/instagram\.com\/(p|reel|reels|tv)\/([A-Za-z0-9_-]+)/);
+  if (!match) return null;
+  const kind = match[1] === "reels" ? "reel" : match[1];
+  return `https://www.instagram.com/${kind}/${match[2]}/embed`;
+}
+
+export default function VideoUploader({ onSelect, onCancel, allowInstagram = false }: VideoUploaderProps) {
+  const [mode, setMode] = useState<"choice" | "upload" | "youtube" | "instagram">("choice");
   const [error, setError] = useState("");
   const [youtubeUrl, setYoutubeUrl] = useState("");
+  const [instagramUrl, setInstagramUrl] = useState("");
   const [preview, setPreview] = useState<VideoData | null>(null);
   const [quality, setQuality] = useState(100);
   const [compressing, setCompressing] = useState(false);
@@ -101,6 +113,16 @@ export default function VideoUploader({ onSelect, onCancel }: VideoUploaderProps
     setPreview({ type: "youtube", youtubeUrl, youtubeId: id });
   };
 
+  const handleInstagramSubmit = () => {
+    const embed = extractInstagramEmbed(instagramUrl);
+    if (!embed) {
+      setError("Invalid Instagram URL. Use a post or reel link.");
+      return;
+    }
+    setError("");
+    setPreview({ type: "instagram", instagramUrl, instagramEmbedUrl: embed });
+  };
+
   const handleConfirm = () => {
     if (!preview) return;
     if (compressed && preview.type === "upload") {
@@ -118,7 +140,7 @@ export default function VideoUploader({ onSelect, onCancel }: VideoUploaderProps
         {mode === "choice" && (
           <div className="space-y-6">
             <p className="text-sm text-center">Add Video</p>
-            <div className="grid grid-cols-2 gap-4">
+            <div className={`grid gap-4 ${allowInstagram ? "grid-cols-3" : "grid-cols-2"}`}>
               <button
                 onClick={() => setMode("upload")}
                 className="border border-[var(--border)] rounded-md p-6 text-center hover:bg-[var(--text)]/5 transition-colors"
@@ -133,8 +155,18 @@ export default function VideoUploader({ onSelect, onCancel }: VideoUploaderProps
               >
                 <p className="text-xs uppercase tracking-[0.15em]">YouTube</p>
                 <p className="text-[9px] text-[var(--text-muted)] mt-2">Paste URL</p>
-                <p className="text-[9px] text-yellow-500">Has YouTube watermark</p>
+                <p className="text-[9px] text-yellow-500">Has watermark</p>
               </button>
+              {allowInstagram && (
+                <button
+                  onClick={() => setMode("instagram")}
+                  className="border border-[var(--border)] rounded-md p-6 text-center hover:bg-[var(--text)]/5 transition-colors"
+                >
+                  <p className="text-xs uppercase tracking-[0.15em]">Instagram</p>
+                  <p className="text-[9px] text-[var(--text-muted)] mt-2">Post / Reel URL</p>
+                  <p className="text-[9px] text-[var(--text-muted)]">Embedded reel</p>
+                </button>
+              )}
             </div>
             <div className="flex justify-center">
               <button onClick={onCancel} className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
@@ -198,10 +230,38 @@ export default function VideoUploader({ onSelect, onCancel }: VideoUploaderProps
           </div>
         )}
 
+        {mode === "instagram" && !preview && (
+          <div className="space-y-6">
+            <p className="text-sm text-center">Instagram Video</p>
+            <div className="border border-[var(--border)] rounded-md p-3 bg-[var(--text)]/5">
+              <p className="text-[9px] text-[var(--text-muted)] text-center">Paste a public Instagram post or reel link, e.g. instagram.com/reel/ABC123/</p>
+            </div>
+            <input
+              type="text"
+              placeholder="Paste Instagram URL"
+              value={instagramUrl}
+              onChange={(e) => setInstagramUrl(e.target.value)}
+              className="w-full bg-transparent border-b border-[var(--border)] py-3 text-sm outline-none focus:border-[var(--text)] transition-colors"
+            />
+            {error && <p className="text-xs text-red-500">{error}</p>}
+            <div className="flex justify-between">
+              <button onClick={() => { setMode("choice"); resetCompression(); setError(""); }} className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
+                ← Back
+              </button>
+              <button
+                onClick={handleInstagramSubmit}
+                className="text-[10px] uppercase tracking-[0.2em] px-4 py-2 border border-[var(--text)] rounded-md hover:bg-[var(--text)] hover:text-[var(--bg)] transition-all"
+              >
+                Preview
+              </button>
+            </div>
+          </div>
+        )}
+
         {preview && (
           <div className="space-y-6">
             <p className="text-sm text-center">Preview</p>
-            <div className="aspect-video bg-black rounded-md overflow-hidden">
+            <div className={`bg-black rounded-md overflow-hidden ${preview.type === "instagram" ? "aspect-[9/12] max-w-[320px] mx-auto" : "aspect-video"}`}>
               {preview.type === "upload" && preview.localUrl && (
                 <video src={preview.localUrl} className="w-full h-full object-cover" controls muted />
               )}
@@ -211,6 +271,15 @@ export default function VideoUploader({ onSelect, onCancel }: VideoUploaderProps
                   className="w-full h-full"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
+                />
+              )}
+              {preview.type === "instagram" && preview.instagramEmbedUrl && (
+                <iframe
+                  src={preview.instagramEmbedUrl}
+                  className="w-full h-full"
+                  allow="autoplay; clipboard-write; encrypted-media; picture-in-picture"
+                  allowFullScreen
+                  scrolling="no"
                 />
               )}
             </div>
@@ -269,7 +338,9 @@ export default function VideoUploader({ onSelect, onCancel }: VideoUploaderProps
                 disabled={compressing}
                 className="text-[10px] uppercase tracking-[0.2em] px-5 py-2.5 rounded-md bg-[var(--text)] text-[var(--bg)] hover:opacity-80 transition-opacity disabled:opacity-30"
               >
-                {compressed ? "Add Compressed Video" : "Add Original Video"}
+                {preview.type === "upload"
+                  ? compressed ? "Add Compressed Video" : "Add Original Video"
+                  : preview.type === "instagram" ? "Add Instagram Video" : "Add YouTube Video"}
               </button>
             </div>
           </div>

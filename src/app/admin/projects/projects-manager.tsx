@@ -145,11 +145,16 @@ export default function ProjectsManager({ userRole }: { userRole: string }) {
     e.target.value = "";
   };
 
-  // Called when a video is chosen via the uploader (MP4 upload or YouTube URL)
-  const handleVideoSelect = async (video: { type: "upload" | "youtube"; file?: File; youtubeId?: string; youtubeUrl?: string }) => {
+  // Called when a video is chosen via the uploader (MP4 upload, YouTube or Instagram URL)
+  const handleVideoSelect = async (video: { type: "upload" | "youtube" | "instagram"; file?: File; youtubeId?: string; youtubeUrl?: string; instagramEmbedUrl?: string }) => {
     setShowVideoUploader(false);
     if (video.type === "youtube" && video.youtubeUrl) {
       setVideoUrl(video.youtubeUrl);
+      return;
+    }
+    if (video.type === "instagram" && video.instagramEmbedUrl) {
+      // Store the embeddable URL directly so the project page iframes it as-is.
+      setVideoUrl(video.instagramEmbedUrl);
       return;
     }
     if (video.type === "upload" && video.file) {
@@ -527,6 +532,7 @@ export default function ProjectsManager({ userRole }: { userRole: string }) {
         <VideoUploader
           onSelect={handleVideoSelect}
           onCancel={() => setShowVideoUploader(false)}
+          allowInstagram
         />
       )}
 
