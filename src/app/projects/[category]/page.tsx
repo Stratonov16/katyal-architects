@@ -3,6 +3,7 @@ export const runtime = "edge";
 import Link from "next/link";
 import { query } from "@/lib/db";
 import Navbar from "@/components/Navbar";
+import Loader from "@/components/Loader";
 import { thumb } from "@/lib/media";
 
 const categories = [
@@ -46,6 +47,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
 
   return (
     <>
+      <Loader duration={700} />
       <Navbar />
       <main className="pt-20 px-8 min-h-screen">
         <Link href="/#projects" className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">

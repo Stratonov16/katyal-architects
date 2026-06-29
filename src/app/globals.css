@@ -44,7 +44,7 @@
   /* Hero arrow icon (sits over images) */
   --arrow-icon: #0a0a0a;
   /* Contact CTA — light mode: filled golden button (AWS-style) */
-  --contact-bg: #faf25e;
+  --contact-bg: #f5ce22fe;
   --contact-bg-hover: #ffcf20;
   --contact-text: #1a1a1a;
 }
