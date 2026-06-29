@@ -38,12 +38,37 @@ export async function getCroppedImageFile(
   return new File([blob], fileName.replace(/\.[^.]+$/, "") + ".jpg", { type: "image/jpeg" });
 }
 
-function loadImage(src: string): Promise<HTMLImageElement> {
+async function loadImage(src: string): Promise<HTMLImageElement> {
+  // For remote (http/https) images, fetch as a blob first and load from an
+  // object URL. This forces a clean CORS request and avoids the "tainted
+  // canvas" error that happens when the browser reuses a cached, non-CORS
+  // copy of an already-displayed image (e.g. an existing hero/about photo).
+  let objectUrl: string | null = null;
+  let imageSrc = src;
+  if (/^https?:\/\//.test(src)) {
+    try {
+      const res = await fetch(src, { mode: "cors", cache: "reload" });
+      if (!res.ok) throw new Error(`Failed to load image (${res.status})`);
+      const blob = await res.blob();
+      objectUrl = URL.createObjectURL(blob);
+      imageSrc = objectUrl;
+    } catch {
+      // Fall back to a direct CORS image load if fetch is blocked.
+      imageSrc = src;
+    }
+  }
+
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.crossOrigin = "anonymous";
-    img.onload = () => resolve(img);
-    img.onerror = reject;
-    img.src = src;
+    img.onload = () => {
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+      resolve(img);
+    };
+    img.onerror = (e) => {
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+      reject(e);
+    };
+    img.src = imageSrc;
   });
 }

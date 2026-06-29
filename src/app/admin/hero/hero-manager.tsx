@@ -6,6 +6,7 @@ import VideoUploader from "@/components/VideoUploader";
 import AdminHeader from "@/components/AdminHeader";
 import Toast from "@/components/Toast";
 import { uploadFileWithProgress } from "@/lib/upload";
+import { getCroppedImageFile } from "@/lib/crop-image";
 
 type HeroSlide = {
   id: string;
@@ -32,6 +33,7 @@ export default function HeroManager({ userRole }: { userRole: string }) {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadLabel, setUploadLabel] = useState("");
+  const [previewIndex, setPreviewIndex] = useState(0);
   const [projectsList, setProjectsList] = useState<{id: number; title: string; slug: string; category: string}[]>([]);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -69,6 +71,21 @@ export default function HeroManager({ userRole }: { userRole: string }) {
     }
     fetchData();
   }, []);
+
+  // Rotate the live preview through all slides, honoring each slide's duration
+  useEffect(() => {
+    if (slides.length <= 1) {
+      if (previewIndex !== 0) setPreviewIndex(0);
+      return;
+    }
+    const safeIndex = previewIndex % slides.length;
+    const current = slides[safeIndex];
+    const seconds = current?.duration && current.duration > 0 ? current.duration : 4;
+    const timer = setTimeout(() => {
+      setPreviewIndex((prev) => (prev + 1) % slides.length);
+    }, seconds * 1000);
+    return () => clearTimeout(timer);
+  }, [slides, previewIndex]);
 
   // Upload image/video to R2 with live progress
   const uploadImage = async (file: File): Promise<string | null> => {
@@ -143,11 +160,29 @@ export default function HeroManager({ userRole }: { userRole: string }) {
     );
   };
 
-  const handleCropApply = (id: string, cropData: CropData) => {
-    setSlides((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, cropData } : s))
-    );
+  const handleCropApply = async (id: string, cropData: CropData) => {
+    const slide = slides.find((s) => s.id === id);
     setCroppingSlide(null);
+    if (!slide || !cropData.croppedAreaPixels) return;
+
+    // Bake the crop into a real file and upload it, so the crop actually
+    // applies on the live site (the homepage ignores cropData).
+    setUploading(true);
+    setUploadProgress(0);
+    setUploadLabel("cropped image");
+    try {
+      const croppedFile = await getCroppedImageFile(slide.imageUrl, cropData.croppedAreaPixels, "hero.jpg");
+      const { url } = await uploadFileWithProgress(croppedFile, "hero", (p) => setUploadProgress(p.percent));
+      // Replace this slide's image with the cropped upload; clear cropData
+      // since the crop is now baked into the file itself.
+      setSlides((prev) =>
+        prev.map((s) => (s.id === id ? { ...s, imageUrl: url, cropData: null } : s))
+      );
+      setToast({ message: "Crop applied", type: "success" });
+    } catch (err) {
+      setToast({ message: err instanceof Error ? err.message : "Crop failed", type: "error" });
+    }
+    setUploading(false);
   };
 
   const handleDelete = (id: string) => {
@@ -266,30 +301,51 @@ export default function HeroManager({ userRole }: { userRole: string }) {
           </div>
         )}
 
-        {/* Live preview */}
+        {/* Live preview — cycles through all slides like the homepage */}
         <div className="mb-8">
           <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-3">Live Preview</p>
           <div className="relative aspect-[16/7] bg-[var(--border)] rounded-md overflow-hidden">
             {slides.length > 0 ? (
               <>
-                {slides[0].imageUrl.endsWith(".mp4") || slides[0].imageUrl.endsWith(".webm") ? (
-                  <video src={slides[0].imageUrl} className="w-full h-full object-cover" autoPlay muted loop playsInline />
-                ) : (
-                  <img
-                    src={slides[0].imageUrl}
-                    alt="Hero preview"
-                    className="w-full h-full object-cover"
-                    style={slides[0].cropData ? {
-                      objectPosition: `${50 + slides[0].cropData.x / 5}% ${50 + slides[0].cropData.y / 5}%`,
-                      transform: `scale(${slides[0].cropData.zoom})`,
-                    } : undefined}
-                  />
-                )}
-                <div className="absolute bottom-4 left-4 bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded">
+                {slides.map((slide, i) => (
+                  <div
+                    key={slide.id}
+                    className={`absolute inset-0 transition-opacity duration-700 ${i === previewIndex % slides.length ? "opacity-100" : "opacity-0"}`}
+                  >
+                    {slide.imageUrl.endsWith(".mp4") || slide.imageUrl.endsWith(".webm") ? (
+                      <video src={slide.imageUrl} className="w-full h-full object-cover" autoPlay muted loop playsInline />
+                    ) : (
+                      <img
+                        src={slide.imageUrl}
+                        alt="Hero preview"
+                        className="w-full h-full object-cover"
+                        style={slide.cropData ? {
+                          objectPosition: `${50 + slide.cropData.x / 5}% ${50 + slide.cropData.y / 5}%`,
+                          transform: `scale(${slide.cropData.zoom})`,
+                        } : undefined}
+                      />
+                    )}
+                  </div>
+                ))}
+                <div className="absolute bottom-4 left-4 z-10 bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded">
                   <p className="text-[10px] text-white/70 uppercase tracking-[0.15em]">
-                    {slides[0].projectTitle || "Untitled"}
+                    {slides[previewIndex % slides.length]?.projectTitle || "Untitled"}
                   </p>
                 </div>
+                {/* Dot indicators */}
+                {slides.length > 1 && (
+                  <div className="absolute bottom-4 right-4 z-10 flex gap-1.5">
+                    {slides.map((_, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => setPreviewIndex(i)}
+                        className={`h-1 rounded-full transition-all duration-300 ${i === previewIndex % slides.length ? "w-5 bg-white" : "w-2.5 bg-white/40 hover:bg-white/60"}`}
+                        aria-label={`Preview slide ${i + 1}`}
+                      />
+                    ))}
+                  </div>
+                )}
               </>
             ) : (
               <div className="w-full h-full flex items-center justify-center text-[var(--text-muted)] text-sm">
