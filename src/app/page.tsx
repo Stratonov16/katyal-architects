@@ -290,8 +290,9 @@ export default function Home() {
         </section>
 
         {/* 5. Reviews — One card at a time, auto-transitions, arrows */}
-        <section id="reviews" className="reveal py-12">
-          <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-muted)] text-center mb-12">Happy Clients</p>
+        <section id="reviews" className="reveal py-16">
+          <p className="text-xs uppercase tracking-[0.3em] text-[var(--review-accent)] text-center mb-3">Testimonials</p>
+          <h2 className="text-3xl md:text-4xl font-light text-center mb-14">Happy Clients</h2>
           <div className="max-w-5xl mx-auto px-8 relative">
             {/* Left arrow */}
             <button className="review-prev absolute -left-2 md:left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full flex items-center justify-center hover:opacity-60 transition-all duration-300">
@@ -299,26 +300,31 @@ export default function Home() {
             </button>
 
             {/* Cards container — shows one at a time on mobile, 3 on desktop */}
-            <div className="overflow-hidden mx-8 md:mx-12">
+            <div className="overflow-hidden mx-8 md:mx-12 py-4">
               <div className="review-slider flex transition-transform duration-500 ease-in-out">
                 {(reviews.length > 0 ? reviews : [
                   { client_name: "Client Name", project_name: "Residential Villa", quote: "Working with Katyal Architects transformed our vision into reality. Every detail was considered.", photo_url: "" },
                   { client_name: "Another Client", project_name: "Smile Salon", quote: "The design exceeded our expectations. A truly world-class experience.", photo_url: "" },
                   { client_name: "Client Three", project_name: "Heritage Restoration", quote: "They understood our brief instantly and delivered beyond what we imagined.", photo_url: "" },
                 ]).map((review) => (
-                  <div key={review.client_name} className="w-full md:w-1/3 flex-shrink-0 px-2">
-                    <div className="rounded-lg border border-[var(--review-border)] p-8 flex flex-col justify-between h-full shadow-sm">
-                      <p className="text-base font-light italic leading-relaxed">&ldquo;{review.quote}&rdquo;</p>
-                      <div className="mt-6 flex items-center justify-between">
-                        <div>
-                          <p className="text-xs uppercase tracking-[0.1em]">{review.client_name}</p>
-                          <p className="text-[10px] text-[var(--text-muted)] mt-0.5">{review.project_name}</p>
-                        </div>
+                  <div key={review.client_name} className="w-full md:w-1/3 flex-shrink-0 px-3">
+                    <div className="review-card p-8 flex flex-col h-full min-h-[280px]">
+                      <span className="quote-mark text-5xl mb-2 select-none">&ldquo;</span>
+                      <p className="text-base font-light leading-relaxed flex-1">{review.quote}</p>
+                      <div className="mt-6 pt-5 border-t border-[var(--border)] flex items-center gap-3">
                         {review.photo_url ? (
-                          <img src={review.photo_url} alt={review.client_name} className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
+                          <img src={review.photo_url} alt={review.client_name} className="w-11 h-11 rounded-full object-cover flex-shrink-0 ring-1 ring-[var(--review-accent)]/40" />
                         ) : (
-                          <div className="w-10 h-10 rounded-full bg-[var(--border)] flex-shrink-0" />
+                          <div className="w-11 h-11 rounded-full bg-[var(--border)] flex-shrink-0 flex items-center justify-center text-sm font-light text-[var(--text-muted)]">
+                            {review.client_name.charAt(0)}
+                          </div>
                         )}
+                        <div>
+                          <p className="text-xs uppercase tracking-[0.12em] font-medium">{review.client_name}</p>
+                          {review.project_name && (
+                            <p className="text-[10px] text-[var(--text-muted)] mt-0.5">{review.project_name}</p>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>

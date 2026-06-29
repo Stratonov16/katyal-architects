@@ -13,6 +13,12 @@
   --follow-bg: #1e1b2e;
   --follow-text: #a78bfa;
   --review-border: #c9a84c;
+  /* Review cards */
+  --review-card-bg: #141414;
+  --review-card-bg-hover: #181818;
+  --review-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.8);
+  --review-shadow-hover: 0 24px 50px -16px rgba(0, 0, 0, 0.95);
+  --review-accent: #c9a84c;
   /* Hero arrow icon (sits over images) */
   --arrow-icon: #ffffff;
   /* Contact CTA — dark mode: golden text, faint golden hover */
@@ -29,6 +35,12 @@
   --follow-bg: #f0eef6;
   --follow-text: #5b4a9e;
   --review-border: #1a1a1a;
+  /* Review cards */
+  --review-card-bg: #ffffff;
+  --review-card-bg-hover: #ffffff;
+  --review-shadow: 0 8px 24px -10px rgba(0, 0, 0, 0.15);
+  --review-shadow-hover: 0 22px 44px -14px rgba(0, 0, 0, 0.22);
+  --review-accent: #b8932e;
   /* Hero arrow icon (sits over images) */
   --arrow-icon: #0a0a0a;
   /* Contact CTA — light mode: filled golden button (AWS-style) */
@@ -68,6 +80,46 @@ h1, h2, h3, h4, h5, h6 {
 [data-theme="light"] .contact-cta:hover {
   background: var(--contact-bg-hover);
   opacity: 1;
+}
+
+/* Review cards — elevated, premium, with a bouncy hover lift */
+.review-card {
+  position: relative;
+  background: var(--review-card-bg);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  box-shadow: var(--review-shadow);
+  overflow: hidden;
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.45s ease, background 0.3s ease, border-color 0.3s ease;
+}
+/* Thin golden accent bar across the top */
+.review-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--review-accent), transparent);
+  opacity: 0.5;
+  transition: opacity 0.4s ease;
+}
+.review-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--review-shadow-hover);
+  background: var(--review-card-bg-hover);
+  border-color: var(--review-accent);
+}
+.review-card:hover::before {
+  opacity: 1;
+}
+/* Big decorative opening quote mark */
+.review-card .quote-mark {
+  font-family: var(--font-display), serif;
+  color: var(--review-accent);
+  opacity: 0.35;
+  line-height: 0.6;
 }
 
 /* Scroll reveal animation */
