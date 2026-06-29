@@ -293,25 +293,25 @@ export default function Home() {
         </section>
 
         {/* 5. Reviews — One card at a time, auto-transitions, arrows */}
-        <section id="reviews" className="reveal py-16">
+        <section id="reviews" className="reveal pt-16 pb-8">
           <p className="text-xs uppercase tracking-[0.3em] text-[var(--review-accent)] text-center mb-3">Testimonials</p>
-          <h2 className="text-3xl md:text-4xl font-light text-center mb-14">Happy Clients</h2>
-          <div className="max-w-5xl mx-auto px-8 relative">
+          <h2 className="text-3xl md:text-4xl font-light text-center mb-12">Happy Clients</h2>
+          <div className="max-w-5xl mx-auto px-3 md:px-8 relative">
             {/* Left arrow */}
-            <button className="review-prev absolute -left-2 md:left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full flex items-center justify-center hover:opacity-60 transition-all duration-300">
+            <button className="review-prev absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 md:w-10 h-10 flex items-center justify-center hover:opacity-60 transition-all duration-300">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
             </button>
 
             {/* Cards container — shows one at a time on mobile, 3 on desktop */}
-            <div className="overflow-hidden mx-8 md:mx-12 py-4">
+            <div className="overflow-hidden mx-7 md:mx-12 py-4">
               <div className="review-slider flex transition-transform duration-500 ease-in-out">
                 {(reviews.length > 0 ? reviews : [
                   { client_name: "Client Name", project_name: "Residential Villa", quote: "Working with Katyal Architects transformed our vision into reality. Every detail was considered.", photo_url: "" },
                   { client_name: "Another Client", project_name: "Smile Salon", quote: "The design exceeded our expectations. A truly world-class experience.", photo_url: "" },
                   { client_name: "Client Three", project_name: "Heritage Restoration", quote: "They understood our brief instantly and delivered beyond what we imagined.", photo_url: "" },
                 ]).map((review) => (
-                  <div key={review.client_name} className="w-full md:w-1/3 flex-shrink-0 px-3">
-                    <div className="review-card p-8 flex flex-col h-full min-h-[280px]">
+                  <div key={review.client_name} className="w-full md:w-1/3 flex-shrink-0 px-2 md:px-3">
+                    <div className="review-card p-6 md:p-8 flex flex-col h-full min-h-[200px]">
                       <span className="quote-mark text-5xl mb-2 select-none">&ldquo;</span>
                       <p className="text-base font-light leading-relaxed flex-1">{review.quote}</p>
                       <div className="mt-6 pt-5 border-t border-[var(--border)] flex items-center gap-3">
@@ -336,7 +336,7 @@ export default function Home() {
             </div>
 
             {/* Right arrow */}
-            <button className="review-next absolute -right-2 md:right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full flex items-center justify-center hover:opacity-60 transition-all duration-300">
+            <button className="review-next absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 md:w-10 h-10 flex items-center justify-center hover:opacity-60 transition-all duration-300">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
             </button>
           </div>
