@@ -231,13 +231,13 @@ export default function Home() {
               <img
                 src={about.photo_url}
                 alt="About"
-                className="max-w-xs md:max-w-sm w-full h-auto rounded-md mx-auto mb-8"
+                className="max-w-md md:max-w-xl w-full h-auto rounded-md mx-auto mb-8"
               />
             )}
             <h2 className="text-3xl md:text-5xl font-light leading-tight">
               {about?.headline || "We design spaces that inspire, transform, and endure."}
             </h2>
-            <p className="mt-8 text-[var(--text-muted)] leading-relaxed max-w-xl mx-auto">
+            <p className="mt-8 text-[var(--text-muted)] leading-relaxed max-w-xl mx-auto whitespace-pre-line">
               {about?.description || "Katyal Architects is a design studio led by Shubham Katyal, creating architecture and interiors that balance bold vision with refined execution."}
             </p>
           </div>
