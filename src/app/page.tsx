@@ -121,12 +121,13 @@ export default function Home() {
         {/* 1. Hero — Auto-rotating Project Carousel.
             Mobile: full-height, image runs under the floating burger/toggle.
             Desktop: sits below the solid 3.5rem nav bar. */}
-        <section className="relative min-h-screen md:min-h-[calc(100vh-3.5rem)] md:mt-14 flex items-end overflow-hidden">
+        <section className="relative min-h-[100svh] md:min-h-[calc(100vh-3.5rem)] md:mt-14 flex items-end overflow-hidden">
           {/* Background media from D1/R2 */}
           {heroSlides.length > 0 ? (
             heroSlides.map((slide, i) => {
               const url = slide.image_url;
               const isVideo = url.endsWith(".mp4") || url.endsWith(".webm") || url.endsWith(".mov");
+              const isInstagram = url.includes("instagram.com");
               const isYoutube = url.includes("youtube.com") || url.includes("youtu.be") || url.includes("img.youtube.com");
               const youtubeId = isYoutube ? url.match(/vi\/([^/]+)/)?.[1] || url.match(/embed\/([^?]+)/)?.[1] || url.match(/v=([^&]+)/)?.[1] : null;
 
@@ -141,6 +142,18 @@ export default function Home() {
                       loop
                       playsInline
                     />
+                  ) : isInstagram ? (
+                    // Instagram embeds are portrait with their own UI — show as a
+                    // centered reel panel on the theme background, not full-bleed.
+                    <div className="w-full h-full bg-[var(--bg)] flex items-center justify-center">
+                      <iframe
+                        src={url}
+                        className="h-[88%] max-h-[720px] aspect-[9/12] border-0"
+                        allow="autoplay; clipboard-write; encrypted-media; picture-in-picture"
+                        scrolling="no"
+                        allowFullScreen
+                      />
+                    </div>
                   ) : isYoutube && youtubeId ? (
                     <iframe
                       src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&mute=1&loop=1&playlist=${youtubeId}&controls=0&showinfo=0&modestbranding=1`}

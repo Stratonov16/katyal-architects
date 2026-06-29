@@ -24,6 +24,10 @@ function isVideoUrl(url: string): boolean {
   return url.endsWith(".mp4") || url.endsWith(".webm") || url.endsWith(".mov");
 }
 
+function isInstagramUrl(url: string): boolean {
+  return url.includes("instagram.com");
+}
+
 export default function HeroManager({ userRole }: { userRole: string }) {
   const [slides, setSlides] = useState<HeroSlide[]>([]);
   const [croppingSlide, setCroppingSlide] = useState<string | null>(null);
@@ -314,6 +318,10 @@ export default function HeroManager({ userRole }: { userRole: string }) {
                   >
                     {slide.imageUrl.endsWith(".mp4") || slide.imageUrl.endsWith(".webm") ? (
                       <video src={slide.imageUrl} className="w-full h-full object-cover" autoPlay muted loop playsInline />
+                    ) : isInstagramUrl(slide.imageUrl) ? (
+                      <div className="w-full h-full bg-[var(--bg)] flex items-center justify-center">
+                        <iframe src={slide.imageUrl} className="h-full aspect-[9/12] border-0" scrolling="no" allow="encrypted-media" />
+                      </div>
                     ) : (
                       <img
                         src={slide.imageUrl}
@@ -394,10 +402,14 @@ export default function HeroManager({ userRole }: { userRole: string }) {
                 {/* Thumbnail — click to re-crop */}
                 <div
                   className="relative w-full h-32 rounded overflow-hidden cursor-pointer group mb-3"
-                  onClick={() => !slide.imageUrl.endsWith(".mp4") && !slide.imageUrl.endsWith(".webm") && setCroppingSlide(slide.id)}
+                  onClick={() => !isVideoUrl(slide.imageUrl) && !isInstagramUrl(slide.imageUrl) && setCroppingSlide(slide.id)}
                 >
                   {slide.imageUrl.endsWith(".mp4") || slide.imageUrl.endsWith(".webm") ? (
                     <video src={slide.imageUrl} className="w-full h-full object-cover" muted playsInline />
+                  ) : isInstagramUrl(slide.imageUrl) ? (
+                    <div className="w-full h-full bg-[var(--bg)] flex items-center justify-center">
+                      <iframe src={slide.imageUrl} className="h-full aspect-[9/12] border-0 pointer-events-none" scrolling="no" allow="encrypted-media" />
+                    </div>
                   ) : (
                     <img
                       src={slide.imageUrl}
@@ -508,19 +520,23 @@ export default function HeroManager({ userRole }: { userRole: string }) {
               url = uploaded || "";
             } else if (video.type === "youtube" && video.youtubeId) {
               url = `https://img.youtube.com/vi/${video.youtubeId}/maxresdefault.jpg`;
+            } else if (video.type === "instagram" && video.instagramEmbedUrl) {
+              url = video.instagramEmbedUrl;
             }
             if (url) {
+              const isReel = url.includes("instagram.com");
               const newSlide: HeroSlide = {
                 id: Date.now().toString() + Math.random(),
                 imageUrl: url,
                 projectTitle: "",
                 projectLink: "",
                 cropData: null,
-                duration: isVideoUrl(url) ? DEFAULT_VIDEO_DURATION : DEFAULT_IMAGE_DURATION,
+                duration: isVideoUrl(url) || isReel ? DEFAULT_VIDEO_DURATION : DEFAULT_IMAGE_DURATION,
               };
               setSlides((prev) => [...prev, newSlide]);
             }
           }}
+          allowInstagram
           onCancel={() => setShowVideoUploader(false)}
         />
       )}
