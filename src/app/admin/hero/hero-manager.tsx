@@ -536,7 +536,6 @@ export default function HeroManager({ userRole }: { userRole: string }) {
               setSlides((prev) => [...prev, newSlide]);
             }
           }}
-          allowInstagram
           onCancel={() => setShowVideoUploader(false)}
         />
       )}
