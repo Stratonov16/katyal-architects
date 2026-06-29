@@ -162,24 +162,16 @@ html {
   animation: loader-fade-in 0.8s ease-out 0.7s both;
 }
 
-/* Gallery image scroll reveal — starts clipped, grows to full */
-.gallery-image {
-  overflow: hidden;
-  max-height: 50vh;
-  opacity: 0.6;
-  transition: max-height 0.8s ease, opacity 0.6s ease;
+/* Gallery tiles — fade + rise in as they scroll into view.
+   No fixed height: each image keeps its natural aspect ratio. */
+.gallery-tile {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
 }
 
-.gallery-image.revealed {
-  max-height: 100vh;
+.gallery-tile.tile-in {
   opacity: 1;
-}
-
-.gallery-image img {
-  transition: transform 0.8s ease;
-}
-
-.gallery-image.revealed img {
-  transform: scale(1);
+  transform: translateY(0);
 }
 
