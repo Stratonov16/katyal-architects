@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import Loader from "@/components/Loader";
 import Link from "next/link";
 import { useEffect, useRef, useCallback, useState } from "react";
+import { thumb } from "@/lib/media";
 
 export default function Home() {
   const sectionsRef = useRef<HTMLDivElement>(null);
@@ -261,7 +262,7 @@ export default function Home() {
                 className="group relative aspect-[4/3] rounded-md overflow-hidden"
               >
                 {item.image_url ? (
-                  <img src={item.image_url} alt={item.name} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <img src={thumb(item.image_url, { width: 600 })} alt={item.name} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                 ) : (
                   <div className="absolute inset-0 bg-[var(--border)] group-hover:scale-105 transition-transform duration-500" />
                 )}

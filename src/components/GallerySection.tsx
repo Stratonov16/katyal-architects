@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import { thumb } from "@/lib/media";
 
 type Props = {
   images: { image_url: string; is_featured: number }[];
@@ -69,9 +70,10 @@ export default function GallerySection({ images, title }: Props) {
             aria-label={`Open image ${i + 1}`}
           >
             <img
-              src={img.image_url}
+              src={thumb(img.image_url, { width: 700 })}
               alt={`${title} ${i + 1}`}
               loading="lazy"
+              decoding="async"
               className="w-full h-auto object-cover group-hover:scale-[1.03] transition-transform duration-500"
             />
           </button>

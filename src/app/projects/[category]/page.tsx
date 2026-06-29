@@ -3,6 +3,7 @@ export const runtime = "edge";
 import Link from "next/link";
 import { query } from "@/lib/db";
 import Navbar from "@/components/Navbar";
+import { thumb } from "@/lib/media";
 
 const categories = [
   { name: "Residential", slug: "residential" },
@@ -67,7 +68,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
                 className="group relative aspect-[4/3] rounded-md overflow-hidden"
               >
                 {project.featured_image ? (
-                  <img src={project.featured_image} alt={project.title} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <img src={thumb(project.featured_image, { width: 800 })} alt={project.title} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                 ) : (
                   <div className="absolute inset-0 bg-[var(--border)] group-hover:scale-105 transition-transform duration-500" />
                 )}

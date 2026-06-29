@@ -5,6 +5,7 @@ import { query, queryOne } from "@/lib/db";
 import Navbar from "@/components/Navbar";
 import GallerySection from "@/components/GallerySection";
 import Loader from "@/components/Loader";
+import { thumb } from "@/lib/media";
 
 const categories = [
   { name: "Residential", slug: "residential" },
@@ -70,8 +71,10 @@ export default async function ProjectPage({ params }: { params: Promise<{ catego
     [project.id]
   );
 
-  const relatedProjects = await query<Project>(
-    `SELECT id, title, slug, category FROM projects WHERE category = ? AND status = 'published' AND slug != ? ORDER BY created_at DESC LIMIT 4`,
+  const relatedProjects = await query<Project & { featured_image?: string }>(
+    `SELECT p.id, p.title, p.slug, p.category,
+       (SELECT image_url FROM project_images WHERE project_id = p.id ORDER BY is_featured DESC, "order" ASC LIMIT 1) as featured_image
+     FROM projects p WHERE p.category = ? AND p.status = 'published' AND p.slug != ? ORDER BY p.created_at DESC LIMIT 4`,
     [category, slug]
   );
 
@@ -182,7 +185,11 @@ export default async function ProjectPage({ params }: { params: Promise<{ catego
                   href={`/projects/${rp.category}/${rp.slug}`}
                   className="group relative aspect-[4/3] rounded-md overflow-hidden"
                 >
-                  <div className="absolute inset-0 bg-[var(--border)] group-hover:scale-105 transition-transform duration-500" />
+                  {rp.featured_image ? (
+                    <img src={thumb(rp.featured_image, { width: 500 })} alt={rp.title} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  ) : (
+                    <div className="absolute inset-0 bg-[var(--border)] group-hover:scale-105 transition-transform duration-500" />
+                  )}
                   <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-300" />
                   <p className="absolute bottom-3 left-3 text-[10px] uppercase tracking-[0.15em] text-white font-light z-10">
                     {rp.title}
