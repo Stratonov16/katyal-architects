@@ -11,7 +11,7 @@
 //   2. Flip USE_CF_RESIZE below to true and redeploy.
 // Until then this returns the original URL, so nothing breaks.
 
-const USE_CF_RESIZE = false;
+const USE_CF_RESIZE = true;
 
 const MEDIA_HOST = "media.katyalarchitects.com";
 
