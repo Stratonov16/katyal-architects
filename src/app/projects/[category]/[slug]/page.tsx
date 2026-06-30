@@ -86,11 +86,16 @@ export default async function ProjectPage({ params }: { params: Promise<{ catego
       <Navbar />
       <main className="min-h-screen pt-14">
         {/* Hero image — full width, no text overlay */}
-        <div className="w-full h-[60vh] md:h-[75vh]">
+        <div className="relative w-full h-[60vh] md:h-[75vh]">
           {featuredImage ? (
-            <img src={featuredImage} alt={project.title} className="w-full h-full object-cover" />
+            <img src={featuredImage} alt={project.title} draggable={false} className="w-full h-full object-cover select-none" />
           ) : (
             <div className="w-full h-full bg-[var(--border)]" />
+          )}
+          {featuredImage && (
+            <span className="pointer-events-none absolute bottom-3 right-3 text-[10px] md:text-xs tracking-[0.2em] uppercase text-white/60 [text-shadow:0_1px_3px_rgba(0,0,0,0.7)]">
+              Katyal Architects
+            </span>
           )}
         </div>
 

@@ -66,7 +66,7 @@ export default function GallerySection({ images, title }: Props) {
           <button
             key={i}
             onClick={() => setLightbox(i)}
-            className="gallery-tile group block w-full mb-3 md:mb-4 break-inside-avoid overflow-hidden rounded-md cursor-zoom-in"
+            className="gallery-tile group relative block w-full mb-3 md:mb-4 break-inside-avoid overflow-hidden rounded-md cursor-zoom-in"
             aria-label={`Open image ${i + 1}`}
           >
             <img
@@ -74,8 +74,14 @@ export default function GallerySection({ images, title }: Props) {
               alt={`${title} ${i + 1}`}
               loading="lazy"
               decoding="async"
-              className="w-full h-auto object-cover group-hover:scale-[1.03] transition-transform duration-500"
+              onContextMenu={(e) => e.preventDefault()}
+              draggable={false}
+              className="w-full h-auto object-cover group-hover:scale-[1.03] transition-transform duration-500 select-none"
             />
+            {/* Watermark */}
+            <span className="pointer-events-none absolute bottom-2 right-2 text-[8px] md:text-[9px] tracking-[0.15em] uppercase text-white/55 [text-shadow:0_1px_2px_rgba(0,0,0,0.6)]">
+              Katyal Architects
+            </span>
           </button>
         ))}
       </div>
@@ -117,12 +123,19 @@ export default function GallerySection({ images, title }: Props) {
           )}
 
           {/* The full image */}
-          <img
-            src={images[lightbox].image_url}
-            alt={`${title} ${lightbox + 1}`}
-            className="max-w-[92vw] max-h-[88vh] w-auto h-auto object-contain rounded"
-            onClick={(e) => e.stopPropagation()}
-          />
+          <div className="relative" onClick={(e) => e.stopPropagation()}>
+            <img
+              src={images[lightbox].image_url}
+              alt={`${title} ${lightbox + 1}`}
+              onContextMenu={(e) => e.preventDefault()}
+              draggable={false}
+              className="max-w-[92vw] max-h-[88vh] w-auto h-auto object-contain rounded select-none"
+            />
+            {/* Watermark */}
+            <span className="pointer-events-none absolute bottom-3 right-3 text-[10px] md:text-xs tracking-[0.2em] uppercase text-white/60 [text-shadow:0_1px_3px_rgba(0,0,0,0.7)]">
+              Katyal Architects
+            </span>
+          </div>
 
           {images.length > 1 && (
             <p className="absolute bottom-4 left-1/2 -translate-x-1/2 text-[11px] tracking-[0.2em] text-white/60 tabular-nums">
