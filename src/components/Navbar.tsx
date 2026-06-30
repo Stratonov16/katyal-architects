@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import ThemeToggle from "./ThemeToggle";
 import Logo from "./Logo";
 
@@ -37,13 +38,13 @@ export default function Navbar({ heroOverlay = false }: { heroOverlay?: boolean 
         </button>
 
         {/* Logo — left (desktop) */}
-        <a href="/" className="hidden md:block">
+        <Link href="/" className="hidden md:block">
           <Logo size="sm" />
-        </a>
+        </Link>
 
         {/* Nav links — center (desktop only) */}
         <div className="hidden md:flex items-center gap-8 text-xs uppercase tracking-[0.15em] font-normal" style={{ fontFamily: "var(--font-body), sans-serif" }}>
-          <a href="/" className="hover:opacity-60 transition-opacity">HOME</a>
+          <Link href="/" className="hover:opacity-60 transition-opacity">HOME</Link>
           <a href="/#about" className="hover:opacity-60 transition-opacity">ABOUT</a>
           <div className="relative">
             <button
@@ -54,16 +55,16 @@ export default function Navbar({ heroOverlay = false }: { heroOverlay?: boolean 
             </button>
             {servicesOpen && (
               <div className="absolute top-8 left-0 bg-[var(--bg)] border border-[var(--border)] rounded-md shadow-lg p-4 flex flex-col gap-3 min-w-[150px]">
-                <a href="/projects/residential" className="text-[10px] uppercase tracking-[0.1em] hover:opacity-60 transition-opacity font-normal">RESIDENTIAL</a>
-                <a href="/projects/hospitality" className="text-[10px] uppercase tracking-[0.1em] hover:opacity-60 transition-opacity font-normal">HOSPITALITY</a>
-                <a href="/projects/interiors" className="text-[10px] uppercase tracking-[0.1em] hover:opacity-60 transition-opacity font-normal">INTERIORS</a>
-                <a href="/projects/landscape" className="text-[10px] uppercase tracking-[0.1em] hover:opacity-60 transition-opacity font-normal">LANDSCAPE</a>
-                <a href="/projects/commercial" className="text-[10px] uppercase tracking-[0.1em] hover:opacity-60 transition-opacity font-normal">COMMERCIAL</a>
-                <a href="/projects/township" className="text-[10px] uppercase tracking-[0.1em] hover:opacity-60 transition-opacity font-normal">TOWNSHIP</a>
+                <Link href="/projects/residential" className="text-[10px] uppercase tracking-[0.1em] hover:opacity-60 transition-opacity font-normal">RESIDENTIAL</Link>
+                <Link href="/projects/hospitality" className="text-[10px] uppercase tracking-[0.1em] hover:opacity-60 transition-opacity font-normal">HOSPITALITY</Link>
+                <Link href="/projects/interiors" className="text-[10px] uppercase tracking-[0.1em] hover:opacity-60 transition-opacity font-normal">INTERIORS</Link>
+                <Link href="/projects/landscape" className="text-[10px] uppercase tracking-[0.1em] hover:opacity-60 transition-opacity font-normal">LANDSCAPE</Link>
+                <Link href="/projects/commercial" className="text-[10px] uppercase tracking-[0.1em] hover:opacity-60 transition-opacity font-normal">COMMERCIAL</Link>
+                <Link href="/projects/township" className="text-[10px] uppercase tracking-[0.1em] hover:opacity-60 transition-opacity font-normal">TOWNSHIP</Link>
               </div>
             )}
           </div>
-          <a href="/careers" className="hover:opacity-60 transition-opacity">CAREERS</a>
+          <Link href="/careers" className="hover:opacity-60 transition-opacity">CAREERS</Link>
           <div className="relative">
             <button
               onClick={() => { setConnectOpen(!connectOpen); setServicesOpen(false); }}
@@ -126,24 +127,24 @@ export default function Navbar({ heroOverlay = false }: { heroOverlay?: boolean 
 
           {/* Menu links */}
           <div className="flex flex-col gap-6 text-xs uppercase tracking-[0.2em] font-normal" style={{ fontFamily: "var(--font-body), sans-serif" }}>
-            <a href="/" onClick={() => setMenuOpen(false)} className="hover:opacity-60 transition-opacity">HOME</a>
+            <Link href="/" onClick={() => setMenuOpen(false)} className="hover:opacity-60 transition-opacity">HOME</Link>
             <a href="/#about" onClick={() => setMenuOpen(false)} className="hover:opacity-60 transition-opacity">ABOUT</a>
             <div>
               <button onClick={() => setMobileServicesOpen(!mobileServicesOpen)} className="hover:opacity-60 transition-opacity">PROJECTS</button>
               {mobileServicesOpen && (
                 <div className="flex flex-col gap-3 mt-3 ml-4 text-[10px] text-[var(--text-muted)]">
-                  <a href="/projects/residential" onClick={() => setMenuOpen(false)} className="hover:opacity-60 transition-opacity">RESIDENTIAL</a>
-                  <a href="/projects/hospitality" onClick={() => setMenuOpen(false)} className="hover:opacity-60 transition-opacity">HOSPITALITY</a>
-                  <a href="/projects/interiors" onClick={() => setMenuOpen(false)} className="hover:opacity-60 transition-opacity">INTERIORS</a>
-                  <a href="/projects/landscape" onClick={() => setMenuOpen(false)} className="hover:opacity-60 transition-opacity">LANDSCAPE</a>
-                  <a href="/projects/commercial" onClick={() => setMenuOpen(false)} className="hover:opacity-60 transition-opacity">COMMERCIAL</a>
-                  <a href="/projects/township" onClick={() => setMenuOpen(false)} className="hover:opacity-60 transition-opacity">TOWNSHIP</a>
+                  <Link href="/projects/residential" onClick={() => setMenuOpen(false)} className="hover:opacity-60 transition-opacity">RESIDENTIAL</Link>
+                  <Link href="/projects/hospitality" onClick={() => setMenuOpen(false)} className="hover:opacity-60 transition-opacity">HOSPITALITY</Link>
+                  <Link href="/projects/interiors" onClick={() => setMenuOpen(false)} className="hover:opacity-60 transition-opacity">INTERIORS</Link>
+                  <Link href="/projects/landscape" onClick={() => setMenuOpen(false)} className="hover:opacity-60 transition-opacity">LANDSCAPE</Link>
+                  <Link href="/projects/commercial" onClick={() => setMenuOpen(false)} className="hover:opacity-60 transition-opacity">COMMERCIAL</Link>
+                  <Link href="/projects/township" onClick={() => setMenuOpen(false)} className="hover:opacity-60 transition-opacity">TOWNSHIP</Link>
                 </div>
               )}
             </div>
-            <a href="/careers" onClick={() => setMenuOpen(false)} className="hover:opacity-60 transition-opacity">CAREERS</a>
+            <Link href="/careers" onClick={() => setMenuOpen(false)} className="hover:opacity-60 transition-opacity">CAREERS</Link>
             <a href="/#contact" onClick={() => setMenuOpen(false)} className="hover:opacity-60 transition-opacity">CONTACT US</a>
-            <a href="/admin" onClick={() => setMenuOpen(false)} className="hover:opacity-60 transition-opacity text-[var(--text-muted)]">ADMIN</a>
+            <Link href="/admin" onClick={() => setMenuOpen(false)} className="hover:opacity-60 transition-opacity text-[var(--text-muted)]">ADMIN</Link>
           </div>
 
           {/* Socials in mobile menu */}

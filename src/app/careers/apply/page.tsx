@@ -2,6 +2,7 @@
 
 import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import { uploadFileWithProgress } from "@/lib/upload";
 
@@ -80,9 +81,9 @@ function ApplyForm() {
           <p className="text-sm text-[var(--text-muted)] max-w-sm leading-relaxed career-rise" style={{ animationDelay: "0.2s" }}>
             Thank you for applying for <span className="text-[var(--text)]">{jobTitle}</span>. We&apos;ll review your application and get back to you soon.
           </p>
-          <a href="/careers" className="mt-8 text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] hover:text-[var(--text)] transition-colors career-rise" style={{ animationDelay: "0.3s" }}>
+          <Link href="/careers" className="mt-8 text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] hover:text-[var(--text)] transition-colors career-rise" style={{ animationDelay: "0.3s" }}>
             ← Back to Careers
-          </a>
+          </Link>
         </div>
       </div>
     );
@@ -98,9 +99,9 @@ function ApplyForm() {
         </div>
 
         <div className="max-w-lg mx-auto px-8 pt-28 pb-20">
-          <a href="/careers" className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] hover:text-[var(--text)] transition-colors career-rise">
+          <Link href="/careers" className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] hover:text-[var(--text)] transition-colors career-rise">
             ← Back to Careers
-          </a>
+          </Link>
           <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--career-accent)] mt-6 mb-2 career-rise" style={{ animationDelay: "0.05s" }}>
             Application
           </p>
