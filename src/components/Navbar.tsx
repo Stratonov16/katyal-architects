@@ -50,7 +50,7 @@ export default function Navbar({ heroOverlay = false }: { heroOverlay?: boolean 
               onClick={() => { setServicesOpen(!servicesOpen); setConnectOpen(false); }}
               className="hover:opacity-60 transition-opacity"
             >
-              SERVICES
+              PROJECTS
             </button>
             {servicesOpen && (
               <div className="absolute top-8 left-0 bg-[var(--bg)] border border-[var(--border)] rounded-md shadow-lg p-4 flex flex-col gap-3 min-w-[150px]">
@@ -129,7 +129,7 @@ export default function Navbar({ heroOverlay = false }: { heroOverlay?: boolean 
             <a href="/" onClick={() => setMenuOpen(false)} className="hover:opacity-60 transition-opacity">HOME</a>
             <a href="/#about" onClick={() => setMenuOpen(false)} className="hover:opacity-60 transition-opacity">ABOUT</a>
             <div>
-              <button onClick={() => setMobileServicesOpen(!mobileServicesOpen)} className="hover:opacity-60 transition-opacity">SERVICES</button>
+              <button onClick={() => setMobileServicesOpen(!mobileServicesOpen)} className="hover:opacity-60 transition-opacity">PROJECTS</button>
               {mobileServicesOpen && (
                 <div className="flex flex-col gap-3 mt-3 ml-4 text-[10px] text-[var(--text-muted)]">
                   <a href="/projects/residential" onClick={() => setMenuOpen(false)} className="hover:opacity-60 transition-opacity">RESIDENTIAL</a>

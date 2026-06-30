@@ -38,7 +38,7 @@ export default function AdminDashboard({ user }: { user: AuthUser }) {
   const sections = [
     { name: "Hero Carousel", href: "/admin/hero", description: "Manage homepage hero images and videos" },
     { name: "Projects", href: "/admin/projects", description: "Add, edit, or remove projects" },
-    { name: "Services", href: "/admin/services", description: "Upload cover images for service categories" },
+    { name: "Project Categories", href: "/admin/services", description: "Upload cover images for project categories" },
     { name: "Team", href: "/admin/team", description: "Manage team members" },
     { name: "Reviews", href: "/admin/reviews", description: "Manage client testimonials" },
     { name: "About", href: "/admin/about", description: "Edit firm description and photo" },

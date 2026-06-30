@@ -266,7 +266,7 @@ export default function Home() {
 
         {/* 3. Projects — Grid of Rectangular Boxes */}
         <section id="projects" className="reveal-grow pt-12 pb-24 px-8">
-          <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-muted)] mb-12 text-center">Services</p>
+          <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-muted)] mb-12 text-center">Projects</p>
           <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
             {(services.length > 0 ? services : [
               { name: "Residential", slug: "residential", image_url: "" },
@@ -451,7 +451,7 @@ export default function Home() {
               <div className="grid grid-cols-2 gap-x-8 gap-y-2">
                 <a href="#about" className="hover:text-white transition-colors duration-300">About</a>
                 <a href="#reviews" className="hover:text-white transition-colors duration-300">Reviews</a>
-                <a href="#projects" className="hover:text-white transition-colors duration-300">Services</a>
+                <a href="#projects" className="hover:text-white transition-colors duration-300">Projects</a>
                 <a href="#contact" className="hover:text-white transition-colors duration-300">Contact</a>
                 <a href="#team" className="hover:text-white transition-colors duration-300">Team</a>
                 <a href="/admin" className="hover:text-white transition-colors duration-300">Admin</a>

@@ -93,7 +93,7 @@ export default function ServicesManager({ userRole }: { userRole: string }) {
             ← Dashboard
           </a>
           <h1 className="text-2xl font-light mt-2" style={{ fontFamily: "var(--font-display), serif" }}>
-            Services
+            Project Categories
           </h1>
           <p className="text-[10px] text-[var(--text-muted)] mt-2">Click on any card to upload/change the cover image for that category</p>
         </div>
