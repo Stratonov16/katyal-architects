@@ -82,7 +82,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ catego
 
   return (
     <>
-      <Loader duration={1500} />
+      <Loader duration={2500} />
       <Navbar />
       <main className="min-h-screen pt-14">
         {/* Hero image — full width, no text overlay */}

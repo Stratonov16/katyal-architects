@@ -6,6 +6,10 @@ import Navbar from "@/components/Navbar";
 import Loader from "@/components/Loader";
 import { thumb } from "@/lib/media";
 
+// Thumbnails are now small (Cloudflare-resized), so the category listing loads
+// fast and doesn't need the intro loader. Flip to true to bring it back.
+const SHOW_CATEGORY_LOADER = false;
+
 const categories = [
   { name: "Residential", slug: "residential" },
   { name: "Hospitality", slug: "hospitality" },
@@ -47,7 +51,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
 
   return (
     <>
-      <Loader duration={700} />
+      {SHOW_CATEGORY_LOADER && <Loader duration={700} />}
       <Navbar />
       <main className="pt-20 px-8 min-h-screen">
         <Link href="/#projects" className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
