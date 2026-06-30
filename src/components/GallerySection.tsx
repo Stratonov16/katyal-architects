@@ -8,6 +8,15 @@ type Props = {
   title: string;
 };
 
+// Tiled diagonal "Katyal Architects" watermark — repeats across the whole image.
+const WM_SVG = encodeURIComponent(
+  `<svg xmlns='http://www.w3.org/2000/svg' width='300' height='180'><text x='10' y='100' fill='rgba(255,255,255,0.14)' font-size='20' font-family='system-ui,sans-serif' letter-spacing='3' transform='rotate(-28 150 90)'>Katyal Architects</text></svg>`
+);
+const tiledWatermark: React.CSSProperties = {
+  backgroundImage: `url("data:image/svg+xml,${WM_SVG}")`,
+  backgroundRepeat: "repeat",
+};
+
 export default function GallerySection({ images, title }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [lightbox, setLightbox] = useState<number | null>(null);
@@ -78,7 +87,9 @@ export default function GallerySection({ images, title }: Props) {
               draggable={false}
               className="w-full h-auto object-cover group-hover:scale-[1.03] transition-transform duration-500 select-none"
             />
-            {/* Watermark */}
+            {/* Tiled diagonal watermark across the whole image */}
+            <span className="pointer-events-none absolute inset-0" style={tiledWatermark} />
+            {/* Corner watermark */}
             <span className="pointer-events-none absolute bottom-2 right-2 text-[8px] md:text-[9px] tracking-[0.15em] uppercase text-white/55 [text-shadow:0_1px_2px_rgba(0,0,0,0.6)]">
               Katyal Architects
             </span>
@@ -131,7 +142,9 @@ export default function GallerySection({ images, title }: Props) {
               draggable={false}
               className="max-w-[92vw] max-h-[88vh] w-auto h-auto object-contain rounded select-none"
             />
-            {/* Watermark */}
+            {/* Tiled diagonal watermark across the whole image */}
+            <span className="pointer-events-none absolute inset-0" style={tiledWatermark} />
+            {/* Corner watermark */}
             <span className="pointer-events-none absolute bottom-3 right-3 text-[10px] md:text-xs tracking-[0.2em] uppercase text-white/60 [text-shadow:0_1px_3px_rgba(0,0,0,0.7)]">
               Katyal Architects
             </span>

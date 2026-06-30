@@ -93,9 +93,20 @@ export default async function ProjectPage({ params }: { params: Promise<{ catego
             <div className="w-full h-full bg-[var(--border)]" />
           )}
           {featuredImage && (
-            <span className="pointer-events-none absolute bottom-3 right-3 text-[10px] md:text-xs tracking-[0.2em] uppercase text-white/60 [text-shadow:0_1px_3px_rgba(0,0,0,0.7)]">
-              Katyal Architects
-            </span>
+            <>
+              {/* Tiled diagonal watermark across the whole image */}
+              <span
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  backgroundImage: `url("data:image/svg+xml,${encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' width='300' height='180'><text x='10' y='100' fill='rgba(255,255,255,0.12)' font-size='20' font-family='system-ui,sans-serif' letter-spacing='3' transform='rotate(-28 150 90)'>Katyal Architects</text></svg>")}")`,
+                  backgroundRepeat: "repeat",
+                }}
+              />
+              {/* Corner watermark */}
+              <span className="pointer-events-none absolute bottom-3 right-3 text-[10px] md:text-xs tracking-[0.2em] uppercase text-white/60 [text-shadow:0_1px_3px_rgba(0,0,0,0.7)]">
+                Katyal Architects
+              </span>
+            </>
           )}
         </div>
 
