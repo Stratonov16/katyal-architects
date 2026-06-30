@@ -1,18 +1,24 @@
 import { MetadataRoute } from "next";
 
-// Known AI / LLM training + scraping crawlers we want to keep off the site.
-// (robots.txt is a polite request — compliant bots like ClaudeBot/GPTBot
-// honor it; the hard block is the Cloudflare "Block AI crawlers" toggle.)
-const AI_CRAWLERS = [
-  "GPTBot",
-  "ChatGPT-User",
-  "OAI-SearchBot",
-  "ClaudeBot",
+// "Answer engine" AI crawlers — these power live recommendations in AI
+// assistants (e.g. someone asking ChatGPT/Perplexity "best architect in
+// Hanumangarh"). We ALLOW these so the firm can be discovered/recommended.
+const AI_ANSWER_CRAWLERS = [
+  "GPTBot",          // OpenAI
+  "OAI-SearchBot",   // ChatGPT search
+  "ChatGPT-User",    // ChatGPT live browsing
+  "PerplexityBot",   // Perplexity
+  "Perplexity-User",
+  "ClaudeBot",       // Anthropic / Claude
   "Claude-Web",
   "anthropic-ai",
+];
+
+// Pure training / bulk scraping crawlers — no referral value, just data
+// harvesting. We keep these BLOCKED.
+const AI_TRAINING_CRAWLERS = [
   "Google-Extended",
   "Applebot-Extended",
-  "PerplexityBot",
   "Bytespider",
   "CCBot",
   "Amazonbot",
@@ -33,9 +39,16 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
         disallow: ["/admin/", "/api/"],
       },
-      // AI crawlers — disallow everything.
+      // Answer-engine AI crawlers — allowed (so the firm shows up in AI
+      // assistant recommendations), but kept out of admin/api.
       {
-        userAgent: AI_CRAWLERS,
+        userAgent: AI_ANSWER_CRAWLERS,
+        allow: "/",
+        disallow: ["/admin/", "/api/"],
+      },
+      // Training / bulk scrapers — disallow everything.
+      {
+        userAgent: AI_TRAINING_CRAWLERS,
         disallow: "/",
       },
     ],
